@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+/* ============================================================
+   UK Air Con Tracker — "The Cooling Exchange"
+   Bespoke design law (per Dale, 25 Jun 2026):
+     · ZERO rounded corners — everything is square/sharp
+     · NO emojis, NO glossy gradient cards, NO floating drop-shadows
+     · hierarchy comes from hairline rules + flat colour tints
+     · monospaced TABULAR numerics for every price / BTU / time
+     · status shown as solid SQUARE LEDs (meaning-bearing colour)
+   Aesthetic: airport departure board × weather station × terminal.
+   ============================================================ */
+
+:root {
+  --background: #eef5f8;        /* frost — cool tinted, never pure white */
+  --foreground: #08171f;        /* deep cool ink */
+  --surface: #ffffff;
+  --surface-cool: #e2eef3;
+  --line: #c5dae3;              /* hairline rule */
+  --line-strong: #08171f;       /* editorial heavy rule */
+
+  --brand: #0792b4;             /* cyan — the "active" signal, used sparingly */
+  --brand-deep: #045366;
+  --brand-ink: #042733;
+
+  /* status — meaning-bearing, square LEDs */
+  --instock: #0f9d54;          /* emerald */
+  --low: #c47e00;              /* amber */
+  --sold: #c5372f;             /* red */
+  --drop: #1f5fd0;             /* price-drop blue */
+  --heat: #e85d1c;             /* sunset orange — urgency strip ONLY */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-cool: var(--surface-cool);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --color-brand: var(--brand);
+  --color-brand-deep: var(--brand-deep);
+  --color-brand-ink: var(--brand-ink);
+
+  --color-instock: var(--instock);
+  --color-low: var(--low);
+  --color-sold: var(--sold);
+  --color-drop: var(--drop);
+  --color-heat: var(--heat);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* hard rule: no radius anywhere */
+  --radius: 0px;
+}
+
+* { border-radius: 0 !important; }
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* tabular monospaced numerics — the "instrument" voice */
+.tnum {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* uppercase micro-labels — departure-board headers */
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+/* solid square status LED */
+.led {
+  display: inline-block;
+  width: 0.62rem;
+  height: 0.62rem;
+  flex: none;
+}
+.led-live { animation: ouac-blink 1.8s steps(1, end) infinite; }
+@keyframes ouac-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+/* blueprint grid — static technical backdrop for hero strips */
+.ouac-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--brand) 9%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--brand) 9%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* a single hairline that reads as a measured rule */
+.rule-strong { border-color: var(--line-strong); }
+
+@media (prefers-reduced-motion: reduce) {
+  .led-live { animation: none; }
+}
