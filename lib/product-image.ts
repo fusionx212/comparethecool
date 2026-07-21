@@ -1,60 +1,55 @@
 /**
  * Resolve a product image without LLM / paid APIs.
- * Prefer stored URL → category photo → ASIN CDN attempt → SVG placeholder.
+ * Prefer Amazon CDN (real ASIN) → hosted category art → default.
+ * Do not rely on Unsplash IDs (many 404).
  */
 
 const CATEGORY_PHOTOS: Record<string, string> = {
-  "portable-air-conditioners":
-    "https://images.unsplash.com/photo-1631545806609-34d5bdabe783?auto=format&fit=crop&w=640&h=640&q=80",
-  dehumidifiers:
-    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=640&h=640&q=80",
-  "air-purifiers":
-    "https://images.unsplash.com/photo-1585771724684-38269d6639fd?auto=format&fit=crop&w=640&h=640&q=80",
-  "tower-fans":
-    "https://images.unsplash.com/photo-1615874959471-d3addb0c4f1f?auto=format&fit=crop&w=640&h=640&q=80",
-  "evaporative-coolers":
-    "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=640&h=640&q=80",
-  "oil-radiators":
-    "https://images.unsplash.com/photo-1545259741-2eaacc3865b7?auto=format&fit=crop&w=640&h=640&q=80",
-  "electric-blankets":
-    "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=640&h=640&q=80",
-  "heated-airers":
-    "https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?auto=format&fit=crop&w=640&h=640&q=80",
-  "fridges-freezers":
-    "https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?auto=format&fit=crop&w=640&h=640&q=80",
-  "patio-heaters":
-    "https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?auto=format&fit=crop&w=640&h=640&q=80",
-  "towel-radiators":
-    "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=640&h=640&q=80",
-  "ice-makers":
-    "https://images.unsplash.com/photo-1560008581-09826d1de69e?auto=format&fit=crop&w=640&h=640&q=80",
-  "ceiling-fans":
-    "https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=640&h=640&q=80",
-  "mini-fridges":
-    "https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?auto=format&fit=crop&w=640&h=640&q=80",
-  "wine-coolers":
-    "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=640&h=640&q=80",
-  "chest-freezers":
-    "https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?auto=format&fit=crop&w=640&h=640&q=80",
-  "tumble-dryers":
-    "https://images.unsplash.com/photo-1626806787461-74be3a8e0e0c?auto=format&fit=crop&w=640&h=640&q=80",
-  "smart-thermostats":
-    "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=640&h=640&q=80",
-  "air-quality-monitors":
-    "https://images.unsplash.com/photo-1585771724684-38269d6639fd?auto=format&fit=crop&w=640&h=640&q=80",
+  "portable-air-conditioners": "/img/categories/portable-air-conditioners.svg",
+  dehumidifiers: "/img/categories/dehumidifiers.svg",
+  "air-purifiers": "/img/categories/air-purifiers.svg",
+  "tower-fans": "/img/categories/tower-fans.svg",
+  "evaporative-coolers": "/img/categories/evaporative-coolers.svg",
+  "oil-radiators": "/img/categories/oil-radiators.svg",
+  "electric-blankets": "/img/categories/electric-blankets.svg",
+  "heated-airers": "/img/categories/heated-airers.svg",
+  "fridges-freezers": "/img/categories/fridges-freezers.svg",
+  "patio-heaters": "/img/categories/patio-heaters.svg",
+  "towel-radiators": "/img/categories/towel-radiators.svg",
+  "ice-makers": "/img/categories/ice-makers.svg",
+  "ceiling-fans": "/img/categories/ceiling-fans.svg",
+  "mini-fridges": "/img/categories/mini-fridges.svg",
+  "wine-coolers": "/img/categories/wine-coolers.svg",
+  "chest-freezers": "/img/categories/chest-freezers.svg",
+  "tumble-dryers": "/img/categories/tumble-dryers.svg",
+  "smart-thermostats": "/img/categories/smart-thermostats.svg",
+  "air-quality-monitors": "/img/categories/air-quality-monitors.svg",
 };
 
-const DEFAULT_PHOTO =
-  "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=640&h=640&q=80";
+const DEFAULT_PHOTO = "/img/categories/default.svg";
 
 function looksLikeRealAsin(asin: string | null | undefined): boolean {
   if (!asin) return false;
-  // Real ASINs are 10 chars; our seed placeholders often embed XYZ/FALLBACK
   if (asin.length !== 10) return false;
   if (/XYZ|FALLBACK|COMFE|TROT|MEACO|PROB|LEVO|DYSON|DRAG|DIMP|DREAM|AM07|HONF/i.test(asin)) {
     return false;
   }
   return /^[A-Z0-9]{10}$/i.test(asin);
+}
+
+function isTrustedRemoteImage(url: string): boolean {
+  try {
+    const host = new URL(url).hostname;
+    return (
+      host.endsWith("ssl-images-amazon.com") ||
+      host.endsWith("media-amazon.com") ||
+      host.endsWith("images-amazon.com") ||
+      host.endsWith("ebayimg.com") ||
+      host.endsWith("i.ebayimg.com")
+    );
+  } catch {
+    return false;
+  }
 }
 
 export function amazonCdnImage(asin: string): string {
@@ -66,7 +61,9 @@ export function resolveProductImage(opts: {
   category?: string | null;
   amazonAsin?: string | null;
 }): string {
-  if (opts.image && /^https?:\/\//i.test(opts.image)) return opts.image;
+  const img = opts.image?.trim() || "";
+  if (img.startsWith("/img/")) return img;
+  if (img && isTrustedRemoteImage(img)) return img;
   if (looksLikeRealAsin(opts.amazonAsin)) return amazonCdnImage(opts.amazonAsin!);
   if (opts.category && CATEGORY_PHOTOS[opts.category]) return CATEGORY_PHOTOS[opts.category];
   return DEFAULT_PHOTO;

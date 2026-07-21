@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { resolveProductImage } from "@/lib/product-image";
 
+const LOCAL_FALLBACK = "/img/categories/default.svg";
+
 export function ProductImage({
   name,
   image,
@@ -20,7 +22,7 @@ export function ProductImage({
   const [src, setSrc] = useState(primary);
 
   return (
-    <div className={`flex items-center justify-center overflow-hidden bg-surface-cool ${className}`}>
+    <div className={`relative flex items-center justify-center overflow-hidden bg-surface-cool ${className}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
@@ -28,8 +30,9 @@ export function ProductImage({
         className="h-full w-full object-cover"
         loading="lazy"
         onError={() => {
-          const fallback = resolveProductImage({ category, image: null, amazonAsin: null });
-          if (src !== fallback) setSrc(fallback);
+          if (src === LOCAL_FALLBACK) return;
+          const categoryArt = resolveProductImage({ category, image: null, amazonAsin: null });
+          setSrc(categoryArt !== src ? categoryArt : LOCAL_FALLBACK);
         }}
       />
     </div>

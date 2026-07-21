@@ -92,18 +92,27 @@ export default async function CountryHome({ params }: { params: Promise<{ countr
 
       <section>
         <h2 className="text-2xl font-bold tracking-tight">Categories</h2>
-        <div className="mt-6 grid gap-0 border border-line md:grid-cols-2">
+        <div className="mt-6 grid gap-0 border border-line sm:grid-cols-2 lg:grid-cols-3">
           {cats.map((cat) => (
             <Link
               key={cat.slug}
               href={`/${code}/best/${cat.slug}`}
-              className="group flex items-center justify-between border-b border-line px-5 py-4 hover:bg-surface last:border-b-0 md:odd:border-r"
+              className="group border-b border-line last:border-b-0 sm:odd:border-r lg:[&:nth-child(3n)]:border-r-0 lg:[&:nth-child(3n+1)]:border-l-0"
             >
-              <span>
-                <span className="eyebrow text-foreground/40">{cat.lane}</span>
-                <span className="mt-1 block font-bold group-hover:text-brand">{cat.label}</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`/img/categories/${cat.slug}.svg`}
+                alt=""
+                className="aspect-[4/3] w-full object-cover bg-surface-cool"
+                loading="lazy"
+              />
+              <span className="flex items-center justify-between px-5 py-4">
+                <span>
+                  <span className="eyebrow text-foreground/40">{cat.lane}</span>
+                  <span className="mt-1 block font-bold group-hover:text-brand">{cat.label}</span>
+                </span>
+                <span className="text-sm text-foreground/50">Review →</span>
               </span>
-              <span className="text-sm text-foreground/50">Review →</span>
             </Link>
           ))}
         </div>
