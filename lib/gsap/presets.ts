@@ -1,25 +1,25 @@
 /**
  * GSAP animation presets for Compare the Cool / Compare the Heat.
- * All durations in seconds. All easings from gsap built-ins.
+ * Uses CDN-loaded GSAP (window.gsap). All durations in seconds.
  *
- * Cool site: crisp, precise, cyan-tinted. Think terminal/airport.
- * Heat site: warmer, slower, orange-tinted. Think hearth/comfort.
+ * Cool site: crisp, cyan-tinted. Heat site: warmer, orange-tinted.
  */
-import gsap from "gsap";
 
 export type SiteVibe = "cool" | "heat";
 
-/* ── Colour accents ── */
 const COOL_GLOW = "rgba(7,146,180,0.35)";
 const HEAT_GLOW = "rgba(232,93,28,0.35)";
-
-/* ── Shared defaults ── */
 const BASE = { ease: "power2.out", duration: 0.55 };
 
+function gs() {
+  return (window as any).gsap;
+}
+
 /* ── Card reveal (ScrollTrigger-driven) ── */
-export function cardReveal(el: Element | string, vibe: SiteVibe, staggerIdx = 0) {
-  const glow = vibe === "cool" ? COOL_GLOW : HEAT_GLOW;
-  return gsap.from(el, {
+export function cardReveal(el: Element, vibe: SiteVibe, staggerIdx = 0) {
+  const g = gs();
+  if (!g) return;
+  return g.from(el, {
     ...BASE,
     opacity: 0,
     y: 28,
@@ -33,9 +33,11 @@ export function cardReveal(el: Element | string, vibe: SiteVibe, staggerIdx = 0)
 }
 
 /* ── Stock LED pulse ── */
-export function stockPulse(el: Element | string, vibe: SiteVibe) {
+export function stockPulse(el: Element, vibe: SiteVibe) {
+  const g = gs();
+  if (!g) return;
   const color = vibe === "cool" ? "#0f9d54" : "#e85d1c";
-  return gsap.to(el, {
+  return g.to(el, {
     opacity: 0.55,
     duration: 1.4,
     repeat: -1,
@@ -46,27 +48,26 @@ export function stockPulse(el: Element | string, vibe: SiteVibe) {
 }
 
 /* ── Hero entrance timeline ── */
-export function heroEntrance(
-  container: Element | string,
-  vibe: SiteVibe,
-): gsap.core.Timeline {
-  const glow = vibe === "cool" ? COOL_GLOW : HEAT_GLOW;
-  const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-  tl.from(`${container} h1`, { opacity: 0, y: 24, duration: 0.6 })
-    .from(`${container} p`, { opacity: 0, y: 16, duration: 0.5 }, "-=0.3")
-    .from(`${container} [data-hero-card]`, {
-      opacity: 0,
-      y: 20,
-      duration: 0.45,
-      stagger: 0.08,
-    }, "-=0.2");
+export function heroEntrance(container: Element, vibe: SiteVibe) {
+  const g = gs();
+  if (!g) return;
+  const tl = g.timeline({ defaults: { ease: "power3.out" } });
+  tl.from(container.querySelector("h1"), { opacity: 0, y: 24, duration: 0.6 })
+    .from(container.querySelector("p"), { opacity: 0, y: 16, duration: 0.5 }, "-=0.3")
+    .from(
+      container.querySelectorAll("[data-hero-card]"),
+      { opacity: 0, y: 20, duration: 0.45, stagger: 0.08 },
+      "-=0.2",
+    );
   return tl;
 }
 
 /* ── Best Value badge glow ── */
-export function bestValueGlow(el: Element | string, vibe: SiteVibe) {
+export function bestValueGlow(el: Element, vibe: SiteVibe) {
+  const g = gs();
+  if (!g) return;
   const color = vibe === "cool" ? COOL_GLOW : HEAT_GLOW;
-  return gsap.to(el, {
+  return g.to(el, {
     boxShadow: `0 0 14px ${color}`,
     duration: 2.2,
     repeat: -1,
@@ -74,24 +75,3 @@ export function bestValueGlow(el: Element | string, vibe: SiteVibe) {
     ease: "sine.inOut",
   });
 }
-
-/* ── Number counter (odometer style) ── */
-export function countUp(el: Element | string, target: number, decimals = 1) {
-  const obj = { val: 0 };
-  return gsap.to(obj, {
-    val: target,
-    duration: 1.2,
-    ease: "power2.out",
-    onUpdate() {
-      (el as HTMLElement).textContent = obj.val.toFixed(decimals);
-    },
-    scrollTrigger: {
-      trigger: el,
-      start: "top 92%",
-      toggleActions: "play none none none",
-    },
-  });
-}
-
-/* ── Sort transition (FLIP) ── */
-export { Flip } from "gsap/Flip";
