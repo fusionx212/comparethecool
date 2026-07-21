@@ -8,6 +8,7 @@ import type { CatalogRow, CatalogProductData } from "./contract";
 import type { CategorySlug, Offer } from "@/lib/types";
 import { amazonProductUrl, ebaySearchUrl } from "@/lib/affiliate";
 import { categoryPhoto } from "@/lib/product-image";
+import { imageForSlug } from "@/lib/catalog/image-cache";
 import { getCountry } from "@/lib/countries";
 
 const NOW = "2026-07-21T10:00:00.000Z";
@@ -280,7 +281,7 @@ function buildProduct(code: string, def: SeedDef): CatalogRow {
     brand: def.brand,
     category: def.category,
     season: def.season,
-    image: categoryPhoto(def.category),
+    image: imageForSlug(def.slug) || categoryPhoto(def.category),
     highlights: def.highlights,
     amazon_asin: asin,
     ebay_item_id: null,

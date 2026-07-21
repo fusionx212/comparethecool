@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "seed:catalog": "npx tsx scripts/seed-catalog.ts",
-    "check:affiliate": "node scripts/check-affiliate-readiness.mjs"
+    "check:affiliate": "node scripts/check-affiliate-readiness.mjs",
+    "enrich:images": "npx tsx scripts/enrich-product-images.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",

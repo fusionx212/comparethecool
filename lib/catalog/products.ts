@@ -12,6 +12,7 @@ import {
   seedProductBySlug,
   seedProductsForCountry,
 } from "./seed-data";
+import { imageForSlug } from "./image-cache";
 
 export const REVALIDATE_SECONDS = 3600;
 
@@ -19,6 +20,22 @@ function hasSupabaseEnv(): boolean {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
   return Boolean(url && key && !url.includes("placeholder") && !url.includes("YOUR_"));
+}
+
+function applyImageCache(row: CatalogRow): CatalogRow {
+  const cached = imageForSlug(row.data.slug);
+  if (!cached) return row;
+  const current = row.image || row.data.image || "";
+  const weak =
+    !current ||
+    current.startsWith("/img/") ||
+    current.includes("unsplash.com");
+  if (!weak) return row;
+  return {
+    ...row,
+    image: cached,
+    data: { ...row.data, image: cached },
+  };
 }
 
 async function fromSupabase(
@@ -56,8 +73,8 @@ export async function getProducts(
   category?: string,
 ): Promise<CatalogRow[]> {
   const remote = await fromSupabase(country, category);
-  if (remote.length) return remote;
-  return seedProductsForCountry(country, category);
+  if (remote.length) return remote.map(applyImageCache);
+  return seedProductsForCountry(country, category).map(applyImageCache);
 }
 
 export async function getProductBySlug(
@@ -73,13 +90,15 @@ export async function getProductBySlug(
         .filter("data->>slug", "eq", slug)
         .limit(1);
       if (!error && data?.[0]) {
-        return normalizeRow(data[0] as Record<string, unknown>);
+        const row = normalizeRow(data[0] as Record<string, unknown>);
+        return row ? applyImageCache(row) : null;
       }
     } catch {
       /* fall through */
     }
   }
-  return seedProductBySlug(country, slug);
+  const seed = seedProductBySlug(country, slug);
+  return seed ? applyImageCache(seed) : null;
 }
 
 export async function getRelatedProducts(
