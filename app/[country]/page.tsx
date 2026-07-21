@@ -5,6 +5,23 @@ export function generateStaticParams() {
   return Object.keys(COUNTRIES).map((code) => ({ country: code }));
 }
 
+const CATEGORIES: { slug: string; label: string; icon: string }[] = [
+  { slug: "portable-air-conditioners", label: "Portable Air Conditioners", icon: "❄️" },
+  { slug: "dehumidifiers", label: "Dehumidifiers", icon: "💧" },
+  { slug: "air-purifiers", label: "Air Purifiers", icon: "🌬️" },
+  { slug: "tower-fans", label: "Tower Fans", icon: "🌀" },
+  { slug: "evaporative-coolers", label: "Evaporative Coolers", icon: "💨" },
+  { slug: "electric-blankets", label: "Electric Blankets", icon: "🛌" },
+  { slug: "fridges-freezers", label: "Fridges & Freezers", icon: "🧊" },
+  { slug: "chest-freezers", label: "Chest Freezers", icon: "📦" },
+  { slug: "wine-coolers", label: "Wine Coolers", icon: "🍷" },
+  { slug: "mini-fridges", label: "Mini Fridges", icon: "🧰" },
+  { slug: "tumble-dryers", label: "Tumble Dryers", icon: "👕" },
+  { slug: "ceiling-fans", label: "Ceiling Fans", icon: "🔁" },
+  { slug: "patio-heaters", label: "Patio Heaters", icon: "🔥" },
+  { slug: "towel-radiators", label: "Towel Radiators", icon: "🛁" },
+];
+
 export default async function CountryHome({ params }: { params: Promise<{ country: string }> }) {
   const { country: code } = await params;
   const cc = getCountry(code);
@@ -50,20 +67,9 @@ export default async function CountryHome({ params }: { params: Promise<{ countr
       <section className="mt-12">
         <h2 className="text-2xl font-bold tracking-tight">Latest Reviews & Guides</h2>
         <div className="mt-6 grid gap-6 md:grid-cols-3">
-          <CategoryCard code={code} slug="portable-air-conditioners" label="Portable Air Conditioners" />
-          <CategoryCard code={code} slug="dehumidifiers" label="Dehumidifiers" />
-          <CategoryCard code={code} slug="air-purifiers" label="Air Purifiers" />
-          <CategoryCard code={code} slug="tower-fans" label="Tower Fans" />
-          <CategoryCard code={code} slug="evaporative-coolers" label="Evaporative Coolers" />
-          <CategoryCard code={code} slug="electric-blankets" label="Electric Blankets" />
-          <CategoryCard code={code} slug="fridges-freezers" label="Fridges & Freezers" />
-          <CategoryCard code={code} slug="chest-freezers" label="Chest Freezers" />
-          <CategoryCard code={code} slug="wine-coolers" label="Wine Coolers" />
-          <CategoryCard code={code} slug="mini-fridges" label="Mini Fridges" />
-          <CategoryCard code={code} slug="tumble-dryers" label="Tumble Dryers" />
-          <CategoryCard code={code} slug="ceiling-fans" label="Ceiling Fans" />
-          <CategoryCard code={code} slug="patio-heaters" label="Patio Heaters" />
-          <CategoryCard code={code} slug="towel-radiators" label="Towel Radiators" />
+          {CATEGORIES.map((cat) => (
+            <CategoryCard key={cat.slug} code={code} {...cat} />
+          ))}
         </div>
       </section>
 
@@ -88,13 +94,14 @@ export default async function CountryHome({ params }: { params: Promise<{ countr
   );
 }
 
-function CategoryCard({ code, slug, label }: { code: string; slug: string; label: string }) {
+function CategoryCard({ code, slug, label, icon }: { code: string; slug: string; label: string; icon: string }) {
   return (
     <Link
       href={`/${code}/best/${slug}`}
       className="group border border-line bg-surface p-6 transition-colors hover:border-brand"
     >
-      <h3 className="mb-2 text-lg font-bold group-hover:text-brand">{label}</h3>
+      <span className="text-2xl" aria-hidden="true">{icon}</span>
+      <h3 className="mb-1 mt-2 text-lg font-bold group-hover:text-brand">{label}</h3>
       <p className="text-sm text-foreground/60">Read our expert review →</p>
     </Link>
   );
