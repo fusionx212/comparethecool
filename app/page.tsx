@@ -1,68 +1,62 @@
 import Link from "next/link";
 
-const BRAND_COOL = {
-  name: "Compare the Cool",
-  tagline: "Expert cooling reviews & live price comparison",
-  gradient: "from-brand-ink via-brand to-brand",
-  icon: "❄️",
-};
+export const dynamic = "force-static";
 
 export default function Home() {
   return (
     <>
-      {/* ── Hero ── */}
-      <section className="ouac-grid relative overflow-hidden border-b border-line bg-gradient-to-br from-brand-ink via-brand to-brand-deep text-white">
-        <div className="relative z-10 mx-auto max-w-6xl px-5 py-24 text-center md:py-32">
-          <span className="mb-6 inline-block text-5xl md:text-6xl" aria-hidden="true">
-            {BRAND_COOL.icon}
-          </span>
-          <h1 className="text-4xl font-bold tracking-tight md:text-6xl">
-            {BRAND_COOL.name}
+      <section className="ouac-grid border-b border-line bg-brand-ink text-white">
+        <div className="mx-auto max-w-6xl px-5 py-20 md:py-28">
+          <p className="eyebrow text-white/60">Compare the Cool · Compare the Heat</p>
+          <h1 className="mt-3 text-4xl font-bold tracking-tight md:text-6xl">
+            Expert reviews &amp; live prices
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-white/80">
-            {BRAND_COOL.tagline}
+          <p className="mt-4 max-w-xl text-lg text-white/75">
+            Cooling, heating, and air-quality products across the UK, EU, US, and Australia —
+            year-round catalog, not a one-season spike.
           </p>
-          <p className="mx-auto mt-2 max-w-2xl text-sm text-white/60">
-            Independent expert reviews, live prices across retailers, and honest buying guides
-            for cooling, heating, and air quality products — across Europe, the UK, US, and Australia.
-          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/uk" className="bg-brand px-6 py-3 text-sm font-bold text-white hover:brightness-110">
+              Shop UK
+            </Link>
+            <Link href="/de" className="border border-white/40 px-6 py-3 text-sm font-bold text-white hover:bg-white/10">
+              Shop Deutschland
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* ── Country Grid ── */}
       <div className="mx-auto max-w-6xl px-5 py-16">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <CountryCard code="uk" flag="🇬🇧" name="United Kingdom" />
-          <CountryCard code="de" flag="🇩🇪" name="Deutschland" />
-          <CountryCard code="fr" flag="🇫🇷" name="France" />
-          <CountryCard code="it" flag="🇮🇹" name="Italia" />
-          <CountryCard code="es" flag="🇪🇸" name="España" />
-          <CountryCard code="nl" flag="🇳🇱" name="Nederland" />
-          <CountryCard code="us" flag="🇺🇸" name="United States" />
-          <CountryCard code="au" flag="🇦🇺" name="Australia" />
+        <div className="grid gap-0 border border-line sm:grid-cols-2 lg:grid-cols-4">
+          <CountryCard code="uk" name="United Kingdom" />
+          <CountryCard code="de" name="Deutschland" />
+          <CountryCard code="fr" name="France" />
+          <CountryCard code="it" name="Italia" />
+          <CountryCard code="es" name="España" />
+          <CountryCard code="nl" name="Nederland" />
+          <CountryCard code="us" name="United States" />
+          <CountryCard code="au" name="Australia" />
         </div>
       </div>
 
-      {/* ── Info strip ── */}
       <div className="border-t border-line bg-surface">
         <div className="mx-auto max-w-6xl px-5 py-8 text-center text-sm text-foreground/60">
-          Live prices from Amazon and eBay · Updated daily · Independent reviews · Affiliate disclosure
+          Prices from Amazon and eBay · Catalog in Supabase · Affiliate disclosure on every buy link
         </div>
       </div>
     </>
   );
 }
 
-function CountryCard({ code, flag, name }: { code: string; flag: string; name: string }) {
+function CountryCard({ code, name }: { code: string; name: string }) {
   return (
     <Link
       href={`/${code}`}
-      className="group border border-line bg-surface p-6 transition-colors hover:border-brand hover:bg-white"
+      className="group border-b border-r border-line bg-surface p-6 transition-colors hover:bg-surface-cool"
     >
-      <span className="text-2xl" aria-hidden="true">{flag}</span>
+      <p className="eyebrow text-foreground/40">{code.toUpperCase()}</p>
       <h3 className="mt-2 text-lg font-bold group-hover:text-brand">{name}</h3>
-      <p className="mt-1 text-sm text-foreground/60">
-        Best reviews & prices →</p>
+      <p className="mt-1 text-sm text-foreground/60">Best reviews &amp; prices →</p>
     </Link>
   );
 }

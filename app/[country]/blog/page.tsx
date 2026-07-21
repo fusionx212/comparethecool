@@ -1,50 +1,49 @@
 import { COUNTRIES, getCountry } from "@/lib/countries";
 import Link from "next/link";
+import { articlesForCountry } from "@/lib/catalog/articles";
+
+export const dynamic = "force-static";
+export const revalidate = 3600;
 
 export function generateStaticParams() {
   return Object.keys(COUNTRIES).map((code) => ({ country: code }));
 }
 
-export default async function BlogListPage({ params }: { params: Promise<{ country: string }> }) {
+export default async function BlogListPage({
+  params,
+}: {
+  params: Promise<{ country: string }>;
+}) {
   const { country: code } = await params;
   const cc = getCountry(code);
+  const articles = articlesForCountry(code);
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-12">
-      <Link
-        href={`/${code}`}
-        className="eyebrow mb-6 inline-block text-foreground/50 hover:text-brand"
-      >
+      <Link href={`/${code}`} className="eyebrow mb-6 inline-block text-foreground/50 hover:text-brand">
         ← Back to {cc.name}
       </Link>
 
       <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
-        {cc.flag} Blog & Articles — {cc.name}
+        Blog &amp; articles — {cc.name}
       </h1>
       <p className="mt-3 max-w-3xl text-foreground/70">
-        Expert advice, buying guides, and product comparisons for cooling and heating products available in {cc.name}. 
-        All prices in {cc.currencySymbol}.
+        Long-tail guides that feed into our comparison pages. Content is stored offline / in
+        Supabase — not generated per request.
       </p>
 
-      <div className="mt-10">
-        <p className="py-10 text-center text-foreground/50">
-          Blog articles loading from our database. Check back for the latest guides.
-        </p>
-      </div>
-
-      <div className="mt-8 flex flex-wrap gap-4">
-        <Link
-          href={`/${code}/best/portable-air-conditioners`}
-          className="rounded-none border border-line bg-surface px-6 py-3 text-sm font-semibold hover:border-brand hover:text-brand"
-        >
-          Best Portable Air Conditioners
-        </Link>
-        <Link
-          href={`/${code}/best/dehumidifiers`}
-          className="rounded-none border border-line bg-surface px-6 py-3 text-sm font-semibold hover:border-brand hover:text-brand"
-        >
-          Best Dehumidifiers
-        </Link>
+      <div className="mt-10 grid gap-0 border border-line">
+        {articles.map((a) => (
+          <Link
+            key={a.slug}
+            href={`/${code}/blog/${a.slug}`}
+            className="border-b border-line bg-surface px-5 py-5 last:border-b-0 hover:bg-surface-cool"
+          >
+            <p className="eyebrow text-foreground/40">{a.published_at}</p>
+            <h2 className="mt-1 text-lg font-bold hover:text-brand">{a.title}</h2>
+            <p className="mt-1 text-sm text-foreground/65">{a.excerpt}</p>
+          </Link>
+        ))}
       </div>
     </div>
   );

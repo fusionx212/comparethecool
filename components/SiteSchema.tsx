@@ -14,8 +14,10 @@ export function SiteSchema({ inStock, total }: { inStock?: number; total?: numbe
       {
         "@type": "Organization",
         "@id": `${BASE}/#org`,
-        name: "Compare the Cool",
+        name: "Compare the Cool / Compare the Heat",
+        alternateName: ["Compare the Cool", "Compare the Heat"],
         url: BASE,
+        sameAs: ["https://comparetheheat.com"],
         description:
           `Independent expert reviews and price comparison for cooling, heating, and air quality products. We test, rate, and compare portable air conditioners, dehumidifiers, fans, heaters and air purifiers across major retailers.${liveFact}`,
         knowsAbout: [
@@ -47,16 +49,8 @@ export function SiteSchema({ inStock, total }: { inStock?: number; total?: numbe
         "@type": "WebSite",
         "@id": `${BASE}/#website`,
         url: BASE,
-        name: "Compare the Cool",
+        name: "Compare the Cool / Compare the Heat",
         publisher: { "@id": `${BASE}/#org` },
-        potentialAction: {
-          "@type": "SearchAction",
-          target: {
-            "@type": "EntryPoint",
-            urlTemplate: `${BASE}/search?q={search_term_string}`,
-          },
-          "query-input": "required name=search_term_string",
-        },
       },
     ],
   };

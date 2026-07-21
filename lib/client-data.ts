@@ -1,8 +1,12 @@
-import { supabase } from "./supabase";
+/**
+ * Browser helpers — prefer server catalog bake; these remain for progressive use.
+ */
+import { getProducts, getProductBySlug } from "./catalog/products";
+import type { CatalogRow } from "./catalog/contract";
+export { slugLabel } from "./catalog/contract";
 
-/** Shape of a product record from the ctc_products table */
-export interface ProductRecord {
-  id: number;
+export type ProductRecord = {
+  id: string;
   slug: string;
   name: string;
   category: string;
@@ -15,64 +19,44 @@ export interface ProductRecord {
   ebay_item_id: string | null;
   rating: number | null;
   review_count: number | null;
-  data: Record<string, unknown> | null;
+  data: CatalogRow["data"] | null;
   created_at: string | null;
   updated_at: string | null;
+};
+
+function toRecord(row: CatalogRow): ProductRecord {
+  return {
+    id: row.id,
+    slug: row.data.slug,
+    name: row.data.name,
+    category: row.data.category,
+    country_code: row.country_code,
+    image_url: row.image,
+    price: row.price,
+    currency: null,
+    retailer: null,
+    amazon_asin: row.data.amazon_asin ?? null,
+    ebay_item_id: row.data.ebay_item_id ?? null,
+    rating: row.data.rating ?? null,
+    review_count: row.data.review_count ?? null,
+    data: row.data,
+    created_at: null,
+    updated_at: null,
+  };
 }
 
-/** Slug → display label */
-export function slugLabel(slug: string): string {
-  return slug
-    .replace(/-/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-/**
- * Fetch products for a given country and optional category.
- * Called from the browser — works with static export.
- */
 export async function fetchProducts(
   country: string,
   category?: string,
 ): Promise<ProductRecord[]> {
-  let query = supabase
-    .from("ctc_products")
-    .select("*")
-    .eq("country_code", country);
-
-  if (category) {
-    // Try slug match first, then name match
-    query = query.or(`category.eq.${category},slug.eq.${category}`);
-  }
-
-  const { data, error } = await query.order("rating", { ascending: false });
-
-  if (error) {
-    console.error("fetchProducts error:", error);
-    return [];
-  }
-
-  return (data ?? []) as ProductRecord[];
+  const rows = await getProducts(country, category);
+  return rows.map(toRecord);
 }
 
-/**
- * Fetch a single product by slug and country.
- */
 export async function fetchProductBySlug(
   slug: string,
   country: string,
 ): Promise<ProductRecord | null> {
-  const { data, error } = await supabase
-    .from("ctc_products")
-    .select("*")
-    .eq("slug", slug)
-    .eq("country_code", country)
-    .single();
-
-  if (error) {
-    console.error("fetchProductBySlug error:", error);
-    return null;
-  }
-
-  return data as ProductRecord | null;
+  const row = await getProductBySlug(country, slug);
+  return row ? toRecord(row) : null;
 }

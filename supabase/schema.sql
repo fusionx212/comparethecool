@@ -64,4 +64,5 @@ ALTER TABLE ctc_price_snapshots ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "public read products" ON ctc_products FOR SELECT USING (true);
 CREATE POLICY "public read clicks" ON ctc_clicks FOR SELECT USING (true);
+CREATE POLICY "public insert clicks" ON ctc_clicks FOR INSERT WITH CHECK (true);
 CREATE POLICY "public read price_snapshots" ON ctc_price_snapshots FOR SELECT USING (true);
