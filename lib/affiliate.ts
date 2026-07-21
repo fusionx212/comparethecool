@@ -1,6 +1,7 @@
 /**
- * Affiliate URL wrappers — Amazon seasonal tags + eBay EPN campid.
- * Tag selection uses activeAmazonTag() (hemisphere-aware). Never hardcode cool-only.
+ * Affiliate URL wrappers — Amazon seasonal tags + eBay EPN.
+ * eBay tracking: campid on URLs + EPN Smart Tools (layout) rewrite on click.
+ * Campaign: EBAY_EPN_CAMPID (5339164583).
  */
 
 import {

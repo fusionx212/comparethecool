@@ -6,6 +6,7 @@ import { HeatStrip } from "@/components/HeatStrip";
 import { Footer } from "@/components/Footer";
 import { SiteSchema } from "@/components/SiteSchema";
 import { CookieConsent } from "@/components/CookieConsent";
+import { EbayEpnSmartTools } from "@/components/EbayEpnSmartTools";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="flex-1">{children}</main>
         <Footer />
         <CookieConsent />
+        <EbayEpnSmartTools />
       </body>
     </html>
   );
