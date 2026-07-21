@@ -120,6 +120,23 @@ const SEEDS: SeedDef[] = [
     room_size_m2: 95,
     popularity: 85,
   },
+  {
+    slug: "aurahome-9000-btu-4-in-1-ac",
+    name: "AuraHome 9000 BTU 4-in-1 Portable Air Conditioner",
+    brand: "AuraHome",
+    category: "portable-air-conditioners",
+    season: "summer",
+    asinByMarket: { uk: "B0FLV7SC1J" },
+    basePrice: { uk: 499, de: 519, fr: 509, it: 499, es: 495, nl: 529, us: 549, au: 799 },
+    rating: 3.8,
+    highlights: ["9000 BTU", "4-in-1: cool, dehum, fan, purify", "Digital display + remote"],
+    verdict: "Amazon #5 bestseller — the cheapest way into a 4-in-1 AC. Cools adequately for medium rooms; the purification is a bonus, not a replacement for a dedicated purifier.",
+    pros: ["4-in-1 versatility", "Window kit included", "Remote control"],
+    cons: ["Purification is minimal", "Build quality reflects price", "60dB at full speed"],
+    btu: 9000,
+    room_size_m2: 26,
+    popularity: 90,
+  },
   // —— Dehumidifiers (all-year) ——
   {
     slug: "meaco-arete-one-12l",
