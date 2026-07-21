@@ -24,7 +24,6 @@ async function main() {
     price: r.price,
     image: r.image,
     last_checked: r.last_checked,
-    updated_at: new Date().toISOString(),
   }));
 
   console.log(`Upserting ${rows.length} catalog rows…`);
