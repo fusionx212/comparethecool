@@ -1,2 +1,5 @@
 # Clean URLs — /de serves de.html, /de/best/x serves de/best/x.html
 /*  /:splat.html  200
+
+# comparetheheat.com → comparethecool.com
+https://comparetheheat.com/*  https://comparethecool.com/:splat  301!
