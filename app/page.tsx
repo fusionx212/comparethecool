@@ -41,7 +41,10 @@ export default function Home() {
 
       <div className="border-t border-line bg-surface">
         <div className="mx-auto max-w-6xl px-5 py-8 text-center text-sm text-foreground/60">
-          Prices from Amazon and eBay · Catalog in Supabase · Affiliate disclosure on every buy link
+          Independent reviews · We may earn from qualifying purchases —{" "}
+          <Link href="/uk/disclosure" className="underline hover:text-brand">
+            disclosure
+          </Link>
         </div>
       </div>
     </>

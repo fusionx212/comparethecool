@@ -60,8 +60,8 @@ export default async function CountryHome({ params }: { params: Promise<{ countr
           Best cooling &amp; heating products in {cc.name}
         </h1>
         <p className="mt-3 max-w-2xl text-foreground/70">
-          Season-aware guides with Amazon and eBay prices from our catalog — built for year-round
-          demand, not one heatwave spike.
+          Expert picks for cooling and heating in {cc.name} — year-round guides, not a one-season
+          spike.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           {featured.map((c) => (

@@ -41,7 +41,7 @@ export async function BestOfView({
       </h1>
       <p className="mt-3 max-w-3xl text-foreground/70">
         {review?.intro?.[0] ||
-          `Independent picks for ${cc.name} with live catalog prices. Filter, compare, then open a deal when you are ready.`}
+          `Independent picks for ${cc.name}. Filter, compare, then check today's price when you are ready.`}
       </p>
 
       <div className="mt-6 flex flex-wrap gap-3">

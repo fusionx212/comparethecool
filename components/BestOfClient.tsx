@@ -154,7 +154,7 @@ export function BestOfClient({
           </label>
         </div>
         <p className="mt-3 text-xs text-foreground/50">
-          Showing {filtered.length} of {products.length} · prices at last catalog check
+          Showing {filtered.length} of {products.length}
         </p>
       </section>
 
@@ -204,7 +204,7 @@ export function BestOfClient({
       <section id="compare" className="mt-12 overflow-x-auto border border-line bg-surface">
         <div className="border-b border-line px-5 py-3">
           <p className="eyebrow text-foreground/50">Side-by-side</p>
-          <h2 className="text-xl font-bold">Live catalog prices</h2>
+          <h2 className="text-xl font-bold">Compare prices</h2>
         </div>
         <table className="w-full min-w-[720px] text-left text-sm">
           <thead className="bg-surface-cool text-xs uppercase tracking-wider text-foreground/60">
@@ -270,8 +270,7 @@ export function BestOfClient({
           </tbody>
         </table>
         <p className="border-t border-line px-5 py-2 text-xs text-foreground/50">
-          Prices open your local store in a new tab. We earn from qualifying purchases —
-          disclosed in our affiliate policy.
+          We may earn a commission from qualifying purchases at no extra cost to you.
         </p>
       </section>
 

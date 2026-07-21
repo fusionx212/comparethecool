@@ -28,8 +28,7 @@ export default async function BlogListPage({
         Blog &amp; articles — {cc.name}
       </h1>
       <p className="mt-3 max-w-3xl text-foreground/70">
-        Long-tail guides that feed into our comparison pages. Content is stored offline / in
-        Supabase — not generated per request.
+        Buying guides and tips for cooling, heating, and air quality in {cc.name}.
       </p>
 
       <div className="mt-10 grid gap-0 border border-line">
