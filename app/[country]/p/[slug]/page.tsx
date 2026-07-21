@@ -430,19 +430,22 @@ function BuyButton({
   url,
   currencySymbol,
   status,
+  retailer,
 }: {
   label: string;
   price: number;
   url: string;
   currencySymbol: string;
   status: StockStatus;
+  retailer: "amazon" | "ebay";
 }) {
   const disabled = status === "out_of_stock";
+  const isEbay = retailer === "ebay";
   return (
     <a
       href={disabled ? undefined : url}
       target="_blank"
-      rel="noopener noreferrer sponsored"
+      rel="noopener sponsored nofollow"
       className={`block border p-4 text-center transition-colors ${
         disabled
           ? "border-line bg-surface-cool opacity-50 pointer-events-none"

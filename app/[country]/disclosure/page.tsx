@@ -47,6 +47,17 @@ export default async function DisclosurePage({ params }: { params: Promise<{ cou
         </section>
 
         <section>
+          <h2 className="text-xl font-bold text-foreground mb-3">eBay Partner Network</h2>
+          <p>
+            We are a participant in the eBay Partner Network (ePN). When you click on an eBay link 
+            on our site and complete a purchase, we may earn a commission. Every eBay link clearly 
+            states that clicking will take you to eBay. We do not auto-redirect, modify eBay logos, 
+            use eBay in our domain name, or bid on eBay as a paid search term — in full compliance 
+            with the ePN Agreement and Code of Conduct.
+          </p>
+        </section>
+
+        <section>
           <h2 className="text-xl font-bold text-foreground mb-3">What This Means For You</h2>
           <ul className="list-disc pl-6 space-y-2">
             <li>You pay the same price as any other shopper — commissions do not increase your cost</li>
