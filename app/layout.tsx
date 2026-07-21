@@ -8,6 +8,8 @@ import { SiteSchema } from "@/components/SiteSchema";
 import { CookieConsent } from "@/components/CookieConsent";
 import { EbayEpnSmartTools } from "@/components/EbayEpnSmartTools";
 
+import { GsapInit } from "@/components/GsapInit";
+
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
@@ -34,6 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: SITE_BOOT }} />
       </head>
       <body className="flex min-h-full flex-col">
+        <GsapInit />
         <SiteSchema />
         <HeatStrip />
         <SiteHeader />

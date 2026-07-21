@@ -1,10 +1,13 @@
+"use client";
+
 import Link from "next/link";
+import { HeroEntrance } from "@/components/HeroEntrance";
 
 export const dynamic = "force-static";
 
 export default function Home() {
   return (
-    <>
+    <HeroEntrance>
       <section className="ouac-grid border-b border-line bg-brand-ink text-white">
         <div className="mx-auto max-w-6xl px-5 py-20 md:py-28">
           <p className="eyebrow text-white/60">Compare the Cool · Compare the Heat</p>
@@ -47,7 +50,7 @@ export default function Home() {
           </Link>
         </div>
       </div>
-    </>
+    </HeroEntrance>
   );
 }
 
@@ -56,6 +59,7 @@ function CountryCard({ code, name }: { code: string; name: string }) {
     <Link
       href={`/${code}`}
       className="group border-b border-r border-line bg-surface p-6 transition-colors hover:bg-surface-cool"
+      data-hero-card
     >
       <p className="eyebrow text-foreground/40">{code.toUpperCase()}</p>
       <h3 className="mt-2 text-lg font-bold group-hover:text-brand">{name}</h3>

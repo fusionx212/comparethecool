@@ -6,6 +6,8 @@ import type { BestOfProductDTO } from "@/lib/best-of-dto";
 import { ProductImage } from "@/components/ProductImage";
 import { DealActions, type DealOption } from "@/components/DealActions";
 import { StatusLed } from "@/components/StatusLed";
+import { RevealCard } from "@/components/RevealCard";
+import { BestValueBadge } from "@/components/BestValueBadge";
 
 export type { BestOfProductDTO };
 
@@ -165,9 +167,12 @@ export function BestOfClient({
             <p className="eyebrow text-foreground/50">Top picks</p>
           </div>
           <div className="grid gap-0 md:grid-cols-3">
-            {top.map((p, i) => (
+            {top.map((p, i) => {
+              const badge = badges[i] || `Pick #${i + 1}`;
+              const isBestValue = badge === "Best value";
+              return (
+              <RevealCard key={p.id} vibe="cool" index={i}>
               <div
-                key={p.id}
                 className={`flex flex-col gap-3 p-5 ${i < top.length - 1 ? "border-b border-line md:border-b-0 md:border-r" : ""}`}
               >
                 <ProductImage
@@ -177,7 +182,11 @@ export function BestOfClient({
                   amazonAsin={p.amazonAsin}
                   className="aspect-square w-full"
                 />
-                <p className="eyebrow text-brand">{badges[i] || `Pick #${i + 1}`}</p>
+                {isBestValue ? (
+                  <BestValueBadge vibe="cool">{badge}</BestValueBadge>
+                ) : (
+                  <p className="eyebrow text-brand">{badge}</p>
+                )}
                 <h3 className="text-lg font-bold leading-snug">
                   <Link href={`/${code}/p/${p.slug}`} className="hover:text-brand">
                     {p.name}
@@ -195,7 +204,8 @@ export function BestOfClient({
                   primaryLabel="See deals"
                 />
               </div>
-            ))}
+              </RevealCard>
+            )})}
           </div>
         </section>
       )}
@@ -276,8 +286,9 @@ export function BestOfClient({
 
       {/* Full cards */}
       <section className="mt-14 space-y-8">
-        {filtered.map((p) => (
-          <article key={p.id} className="border border-line bg-surface p-6 md:p-8">
+        {filtered.map((p, i) => (
+          <RevealCard key={p.id} vibe="cool" index={i}>
+          <article className="border border-line bg-surface p-6 md:p-8">
             <div className="grid gap-6 md:grid-cols-[180px_1fr]">
               <ProductImage
                 name={p.name}
@@ -332,6 +343,7 @@ export function BestOfClient({
               </div>
             </div>
           </article>
+          </RevealCard>
         ))}
       </section>
 
