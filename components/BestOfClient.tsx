@@ -9,31 +9,35 @@ import { StatusLed } from "@/components/StatusLed";
 
 export type { BestOfProductDTO };
 
+/** One local exit only — Amazon for this country; eBay only if Amazon missing. */
 function dealOptions(
   p: BestOfProductDTO,
   currencySymbol: string,
   marketplaceHint: string,
 ): DealOption[] {
-  const opts: DealOption[] = [];
   if (p.amazonUrl && p.amazonPrice != null) {
-    opts.push({
-      id: "amazon",
-      label: "Primary retailer",
-      priceLabel: `${currencySymbol}${p.amazonPrice.toFixed(2)}`,
-      href: p.amazonUrl,
-      hint: `Opens ${marketplaceHint}`,
-    });
+    return [
+      {
+        id: "amazon",
+        label: "Check today's price",
+        priceLabel: `${currencySymbol}${p.amazonPrice.toFixed(2)}`,
+        href: p.amazonUrl,
+        hint: `Opens ${marketplaceHint}`,
+      },
+    ];
   }
   if (p.ebayUrl && p.ebayPrice != null) {
-    opts.push({
-      id: "ebay",
-      label: "Marketplace deal",
-      priceLabel: `${currencySymbol}${p.ebayPrice.toFixed(2)}`,
-      href: p.ebayUrl,
-      hint: "Opens marketplace listing",
-    });
+    return [
+      {
+        id: "ebay",
+        label: "Check today's price",
+        priceLabel: `${currencySymbol}${p.ebayPrice.toFixed(2)}`,
+        href: p.ebayUrl,
+        hint: "Opens local marketplace",
+      },
+    ];
   }
-  return opts.sort((a, b) => parseFloat(a.priceLabel.replace(/[^\d.]/g, "")) - parseFloat(b.priceLabel.replace(/[^\d.]/g, "")));
+  return [];
 }
 
 type SortKey = "recommended" | "price-asc" | "price-desc" | "rating";
@@ -207,21 +211,18 @@ export function BestOfClient({
             <tr>
               <th className="px-4 py-3 font-semibold">Product</th>
               <th className="px-4 py-3 font-semibold">Rating</th>
-              <th className="px-4 py-3 font-semibold">From</th>
-              <th className="px-4 py-3 font-semibold">Alt</th>
+              <th className="px-4 py-3 font-semibold">Price</th>
+              <th className="px-4 py-3 font-semibold">Also seen</th>
               <th className="px-4 py-3 font-semibold">Stock</th>
-              <th className="px-4 py-3 font-semibold">Deals</th>
+              <th className="px-4 py-3 font-semibold">Buy</th>
             </tr>
           </thead>
           <tbody>
             {filtered.map((p) => {
-              const low =
-                p.amazonPrice != null && p.ebayPrice != null
-                  ? Math.min(p.amazonPrice, p.ebayPrice)
-                  : p.amazonPrice ?? p.ebayPrice;
-              const alt =
-                p.amazonPrice != null && p.ebayPrice != null
-                  ? Math.max(p.amazonPrice, p.ebayPrice)
+              const price = p.amazonPrice ?? p.ebayPrice;
+              const alsoSeen =
+                p.amazonPrice != null && p.ebayPrice != null && p.ebayPrice !== p.amazonPrice
+                  ? p.ebayPrice
                   : null;
               return (
                 <tr key={p.id} className="border-t border-line">
@@ -241,10 +242,10 @@ export function BestOfClient({
                   </td>
                   <td className="px-4 py-3 tnum">{(p.rating ?? 0).toFixed(1)}</td>
                   <td className="px-4 py-3 tnum font-semibold">
-                    {low != null ? `${currencySymbol}${low.toFixed(2)}` : "—"}
+                    {price != null ? `${currencySymbol}${price.toFixed(2)}` : "—"}
                   </td>
                   <td className="px-4 py-3 tnum text-foreground/60">
-                    {alt != null ? `${currencySymbol}${alt.toFixed(2)}` : "—"}
+                    {alsoSeen != null ? `${currencySymbol}${alsoSeen.toFixed(2)}` : "—"}
                   </td>
                   <td className="px-4 py-3">
                     <span className="inline-flex items-center gap-2">
@@ -269,8 +270,8 @@ export function BestOfClient({
           </tbody>
         </table>
         <p className="border-t border-line px-5 py-2 text-xs text-foreground/50">
-          Deals open the retailer in a new tab. We earn from qualifying purchases — disclosed in
-          our affiliate policy.
+          Prices open your local store in a new tab. We earn from qualifying purchases —
+          disclosed in our affiliate policy.
         </p>
       </section>
 

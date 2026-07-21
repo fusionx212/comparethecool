@@ -12,15 +12,15 @@ export type DealOption = {
 };
 
 /**
- * Soft exit: stay on-site until shopper picks a deal.
- * Same brand styling for every retailer — no Amazon orange / eBay red.
- * Disclosure stays; links remain sponsored + new tab.
+ * Soft exit to ONE local retailer (usually that country's Amazon).
+ * Same brand styling — no Amazon orange / eBay red.
+ * Multi-option sheet only if callers pass more than one (fallback markets).
  */
 export function DealActions({
   country,
   productSlug,
   options,
-  primaryLabel = "See today's deals",
+  primaryLabel = "Check today's price",
   compact = false,
 }: {
   country: string;
@@ -44,6 +44,37 @@ export function DealActions({
   if (!options.length) return null;
 
   const best = options[0];
+  const single = options.length === 1;
+
+  const track = (retailerId: string) => {
+    void logAffiliateClick({
+      country_code: country,
+      product_slug: productSlug,
+      retailer_id: retailerId,
+    });
+  };
+
+  // One destination → go straight there (no "pick a shop" friction)
+  if (single) {
+    return (
+      <a
+        href={best.href}
+        target="_blank"
+        rel="noopener sponsored nofollow"
+        className={
+          compact
+            ? "inline-flex bg-brand px-3 py-2 text-xs font-bold text-white hover:brightness-110"
+            : "inline-flex bg-brand px-5 py-3 text-sm font-bold text-white hover:brightness-110"
+        }
+        onClick={() => track(best.id)}
+      >
+        {compact ? "Price" : primaryLabel}
+        {!compact && (
+          <span className="ml-2 font-normal opacity-90">· {best.priceLabel}</span>
+        )}
+      </a>
+    );
+  }
 
   return (
     <>
@@ -61,13 +92,7 @@ export function DealActions({
             target="_blank"
             rel="noopener sponsored nofollow"
             className="border border-foreground px-5 py-3 text-center text-sm font-bold hover:border-brand hover:text-brand"
-            onClick={() => {
-              void logAffiliateClick({
-                country_code: country,
-                product_slug: productSlug,
-                retailer_id: best.id,
-              });
-            }}
+            onClick={() => track(best.id)}
           >
             Quick deal · {best.priceLabel}
           </a>
@@ -87,13 +112,13 @@ export function DealActions({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="border-b border-line px-5 py-4">
-              <p className="eyebrow text-foreground/50">Choose a deal</p>
+              <p className="eyebrow text-foreground/50">Local prices</p>
               <h3 id={titleId} className="mt-1 text-lg font-bold">
-                Compare today&apos;s prices
+                Continue to checkout
               </h3>
               <p className="mt-1 text-xs text-foreground/55">
-                You&apos;ll open the retailer in a new tab. We may earn a commission at no extra
-                cost to you.
+                Opens your local store in a new tab. We may earn a commission at no extra cost
+                to you.
               </p>
             </div>
             <ul className="divide-y divide-line">
@@ -105,17 +130,13 @@ export function DealActions({
                     rel="noopener sponsored nofollow"
                     className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-surface-cool"
                     onClick={() => {
-                      void logAffiliateClick({
-                        country_code: country,
-                        product_slug: productSlug,
-                        retailer_id: opt.id,
-                      });
+                      track(opt.id);
                       setOpen(false);
                     }}
                   >
                     <span>
                       <span className="eyebrow text-brand">
-                        {i === 0 ? "Best today" : `Option ${i + 1}`}
+                        {i === 0 ? "Recommended" : `Option ${i + 1}`}
                       </span>
                       <span className="mt-1 block font-semibold">{opt.label}</span>
                       <span className="text-xs text-foreground/50">{opt.hint}</span>

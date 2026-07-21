@@ -56,26 +56,30 @@ export default async function ProductPage({
     ? wrapOfferUrl(code, "ebay", ebayOffer.url, null, data.ebay_item_id)
     : null;
 
-  const dealOptions = [
+  // One local exit: Amazon for this country; eBay only if Amazon missing
+  const dealOptions = (
     amazonUrl && amazonOffer
-      ? {
-          id: "amazon",
-          label: "Primary retailer",
-          priceLabel: `${cc.currencySymbol}${amazonOffer.price.toFixed(2)}`,
-          href: amazonUrl,
-          hint: `Opens ${cc.amazonMarketplace.replace("www.", "")}`,
-        }
-      : null,
-    ebayUrl && ebayOffer
-      ? {
-          id: "ebay",
-          label: "Marketplace deal",
-          priceLabel: `${cc.currencySymbol}${ebayOffer.price.toFixed(2)}`,
-          href: ebayUrl,
-          hint: "Opens marketplace listing",
-        }
-      : null,
-  ].filter(Boolean) as {
+      ? [
+          {
+            id: "amazon",
+            label: "Check today's price",
+            priceLabel: `${cc.currencySymbol}${amazonOffer.price.toFixed(2)}`,
+            href: amazonUrl,
+            hint: `Opens ${cc.amazonMarketplace.replace("www.", "")}`,
+          },
+        ]
+      : ebayUrl && ebayOffer
+        ? [
+            {
+              id: "ebay",
+              label: "Check today's price",
+              priceLabel: `${cc.currencySymbol}${ebayOffer.price.toFixed(2)}`,
+              href: ebayUrl,
+              hint: "Opens local marketplace",
+            },
+          ]
+        : []
+  ) as {
     id: string;
     label: string;
     priceLabel: string;
@@ -121,7 +125,7 @@ export default async function ProductPage({
             country={code}
             productSlug={data.slug}
             options={dealOptions}
-            primaryLabel="See today's deals"
+            primaryLabel="Check today's price"
           />
         </div>
       </div>

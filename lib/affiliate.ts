@@ -64,7 +64,10 @@ export function ebaySearchUrl(
   return u.toString();
 }
 
-/** Ensure an offer URL carries the right Amazon tag / eBay campid. */
+/**
+ * Force offer URLs onto this country's marketplace — never leave a shopper
+ * on amazon.de when they are browsing /uk, etc.
+ */
 export function wrapOfferUrl(
   country: CountryConfig | string,
   retailerId: string,
@@ -77,6 +80,10 @@ export function wrapOfferUrl(
     if (asin) return amazonProductUrl(cc, asin);
     try {
       const u = new URL(url);
+      const pathAsin = u.pathname.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i)?.[1];
+      if (pathAsin) return amazonProductUrl(cc, pathAsin);
+      u.hostname = cc.amazonMarketplace;
+      u.protocol = "https:";
       u.searchParams.set("tag", activeAmazonTag(cc));
       return u.toString();
     } catch {
@@ -87,9 +94,27 @@ export function wrapOfferUrl(
     if (ebayItemId) return ebayItemUrl(cc, ebayItemId);
     try {
       const u = new URL(url);
-      u.searchParams.set("campid", EBAY_EPN_CAMPID);
-      u.searchParams.set("customid", `ctc-${cc.code}`);
-      return u.toString();
+      const local = new URL(ebaySearchUrl(cc, u.searchParams.get("_nkw") || "product"));
+      // Prefer item links on the local host when we already have /itm/
+      if (/\/itm\//i.test(u.pathname)) {
+        const host =
+          cc.code === "uk"
+            ? "www.ebay.co.uk"
+            : cc.code === "us"
+              ? "www.ebay.com"
+              : cc.code === "au"
+                ? "www.ebay.com.au"
+                : `www.ebay.${cc.code === "de" ? "de" : cc.code === "fr" ? "fr" : cc.code === "it" ? "it" : cc.code === "es" ? "es" : cc.code === "nl" ? "nl" : "de"}`;
+        u.hostname = host;
+        u.protocol = "https:";
+        u.searchParams.set("campid", EBAY_EPN_CAMPID);
+        u.searchParams.set("customid", `ctc-${cc.code}`);
+        u.searchParams.set("mkevt", "1");
+        return u.toString();
+      }
+      local.searchParams.set("campid", EBAY_EPN_CAMPID);
+      local.searchParams.set("customid", `ctc-${cc.code}`);
+      return local.toString();
     } catch {
       return url;
     }
