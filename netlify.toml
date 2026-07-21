@@ -1,72 +1,10 @@
 [build]
   command = "npm run build"
-  publish = "out"
+  publish = ".next"
 
-# Disable Next.js plugin — we're deploying static HTML
-plugins = []
+[build.environment]
+  NEXT_PUBLIC_SUPABASE_URL = "https://kfhttxayccwsuecfmbbz.supabase.co"
+  NEXT_PUBLIC_SITE_URL = "https://comparethecool.com"
 
-[[redirects]]
-  from = "/de"
-  to = "/de.html"
-  status = 200
-
-[[redirects]]
-  from = "/fr"
-  to = "/fr.html"
-  status = 200
-
-[[redirects]]
-  from = "/uk"
-  to = "/uk.html"
-  status = 200
-
-[[redirects]]
-  from = "/us"
-  to = "/us.html"
-  status = 200
-
-[[redirects]]
-  from = "/it"
-  to = "/it.html"
-  status = 200
-
-[[redirects]]
-  from = "/es"
-  to = "/es.html"
-  status = 200
-
-[[redirects]]
-  from = "/nl"
-  to = "/nl.html"
-  status = 200
-
-[[redirects]]
-  from = "/au"
-  to = "/au.html"
-  status = 200
-
-[[redirects]]
-  from = "/eu"
-  to = "/eu.html"
-  status = 200
-
-# Sub-pages
-[[redirects]]
-  from = "/:country/privacy"
-  to = "/:country/privacy.html"
-  status = 200
-
-[[redirects]]
-  from = "/:country/terms"
-  to = "/:country/terms.html"
-  status = 200
-
-[[redirects]]
-  from = "/:country/disclosure"
-  to = "/:country/disclosure.html"
-  status = 200
-
-[[redirects]]
-  from = "/:country/blog"
-  to = "/:country/blog.html"
-  status = 200
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

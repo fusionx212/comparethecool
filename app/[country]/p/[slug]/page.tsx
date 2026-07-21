@@ -236,15 +236,17 @@ export default async function ProductPage({
                 url={amazonOffer.url}
                 currencySymbol={cc.currencySymbol}
                 status={amazonOffer.status}
+                retailer="amazon"
               />
             )}
             {ebayOffer && (
               <BuyButton
-                label="eBay"
+                label={`eBay ${cc.name}`}
                 price={ebayOffer.price}
                 url={ebayOffer.url}
                 currencySymbol={cc.currencySymbol}
                 status={ebayOffer.status}
+                retailer="ebay"
               />
             )}
           </div>
