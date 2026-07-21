@@ -7,7 +7,9 @@ import { notFound } from "next/navigation";
 import { getProductBySlug, getRelatedProducts } from "@/lib/catalog/products";
 import { SEED_CATALOG } from "@/lib/catalog/seed-data";
 import { wrapOfferUrl } from "@/lib/affiliate";
-import { BuyButton as TrackedBuy } from "@/components/BuyButton";
+import { ProductImage } from "@/components/ProductImage";
+import { DealActions } from "@/components/DealActions";
+import { categoryPhoto } from "@/lib/product-image";
 
 export const revalidate = 3600;
 export const dynamic = "force-static";
@@ -54,6 +56,36 @@ export default async function ProductPage({
     ? wrapOfferUrl(code, "ebay", ebayOffer.url, null, data.ebay_item_id)
     : null;
 
+  const dealOptions = [
+    amazonUrl && amazonOffer
+      ? {
+          id: "amazon",
+          label: "Primary retailer",
+          priceLabel: `${cc.currencySymbol}${amazonOffer.price.toFixed(2)}`,
+          href: amazonUrl,
+          hint: `Opens ${cc.amazonMarketplace.replace("www.", "")}`,
+        }
+      : null,
+    ebayUrl && ebayOffer
+      ? {
+          id: "ebay",
+          label: "Marketplace deal",
+          priceLabel: `${cc.currencySymbol}${ebayOffer.price.toFixed(2)}`,
+          href: ebayUrl,
+          hint: "Opens marketplace listing",
+        }
+      : null,
+  ].filter(Boolean) as {
+    id: string;
+    label: string;
+    priceLabel: string;
+    href: string;
+    hint: string;
+  }[];
+
+  const imageSrc =
+    row.image || data.image || categoryPhoto(data.category || "portable-air-conditioners");
+
   return (
     <div className="mx-auto max-w-6xl px-5 py-12">
       <Link href={`/${code}`} className="eyebrow mb-8 inline-block text-foreground/50 hover:text-brand">
@@ -61,16 +93,13 @@ export default async function ProductPage({
       </Link>
 
       <div className="ouac-grid mb-10 grid gap-8 border border-line bg-surface p-6 md:grid-cols-2 md:p-10">
-        <div className="flex items-center justify-center bg-surface-cool p-6">
-          {row.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={row.image} alt={data.name} className="max-h-72 w-full object-contain" />
-          ) : (
-            <div className="flex h-56 w-full items-center justify-center text-foreground/30 tnum text-sm">
-              No image
-            </div>
-          )}
-        </div>
+        <ProductImage
+          name={data.name}
+          image={imageSrc}
+          category={data.category}
+          amazonAsin={data.amazon_asin}
+          className="aspect-square w-full"
+        />
 
         <div className="flex flex-col justify-center gap-4">
           {data.brand && <p className="eyebrow text-brand">{data.brand}</p>}
@@ -88,28 +117,12 @@ export default async function ProductPage({
             {cc.currencySymbol}
             {(row.price ?? 0).toFixed(2)}
           </p>
-          <div className="mt-2 flex flex-wrap gap-3">
-            {amazonUrl && amazonOffer && (
-              <TrackedBuy
-                href={amazonUrl}
-                label={`Amazon ${cc.currencySymbol}${amazonOffer.price.toFixed(2)}`}
-                variant="amazon"
-                country={code}
-                productSlug={data.slug}
-                retailerId="amazon"
-              />
-            )}
-            {ebayUrl && ebayOffer && (
-              <TrackedBuy
-                href={ebayUrl}
-                label={`eBay ${cc.currencySymbol}${ebayOffer.price.toFixed(2)}`}
-                variant="ebay"
-                country={code}
-                productSlug={data.slug}
-                retailerId="ebay"
-              />
-            )}
-          </div>
+          <DealActions
+            country={code}
+            productSlug={data.slug}
+            options={dealOptions}
+            primaryLabel="See today's deals"
+          />
         </div>
       </div>
 
@@ -173,14 +186,23 @@ export default async function ProductPage({
               <Link
                 key={alt.id}
                 href={`/${code}/p/${alt.data.slug}`}
-                className="block border border-line bg-surface p-4 hover:border-brand"
+                className="flex gap-3 border border-line bg-surface p-3 hover:border-brand"
               >
-                <p className="eyebrow text-brand">{alt.data.brand}</p>
-                <p className="mt-1 font-semibold">{alt.data.name}</p>
-                <p className="tnum mt-1 text-brand">
-                  {cc.currencySymbol}
-                  {(alt.price ?? 0).toFixed(2)}
-                </p>
+                <ProductImage
+                  name={alt.data.name}
+                  image={alt.image || alt.data.image}
+                  category={alt.data.category}
+                  amazonAsin={alt.data.amazon_asin}
+                  className="h-16 w-16 flex-none"
+                />
+                <div className="min-w-0">
+                  <p className="eyebrow text-brand">{alt.data.brand}</p>
+                  <p className="mt-1 font-semibold leading-snug">{alt.data.name}</p>
+                  <p className="tnum mt-1 text-brand">
+                    {cc.currencySymbol}
+                    {(alt.price ?? 0).toFixed(2)}
+                  </p>
+                </div>
               </Link>
             ))}
           </div>
@@ -218,34 +240,18 @@ export default async function ProductPage({
         }}
       />
 
-      {(amazonUrl || ebayUrl) && (
+      {(dealOptions.length > 0) && (
         <div className="sticky-buy mt-10 flex flex-wrap items-center justify-between gap-3 px-4 py-3">
           <p className="tnum text-lg font-bold">
             {cc.currencySymbol}
             {(row.price ?? 0).toFixed(2)}
           </p>
-          <div className="flex flex-wrap gap-2">
-            {amazonUrl && (
-              <TrackedBuy
-                href={amazonUrl}
-                label="Buy on Amazon"
-                variant="amazon"
-                country={code}
-                productSlug={data.slug}
-                retailerId="amazon"
-              />
-            )}
-            {ebayUrl && (
-              <TrackedBuy
-                href={ebayUrl}
-                label="Buy on eBay"
-                variant="ebay"
-                country={code}
-                productSlug={data.slug}
-                retailerId="ebay"
-              />
-            )}
-          </div>
+          <DealActions
+            country={code}
+            productSlug={data.slug}
+            options={dealOptions}
+            primaryLabel="See deals"
+          />
         </div>
       )}
     </div>
