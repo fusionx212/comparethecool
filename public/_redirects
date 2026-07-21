@@ -1,5 +1,10 @@
-# Clean URLs — /de serves de.html, /de/best/x serves de/best/x.html
-/*  /:splat.html  200
-
-# comparetheheat.com → comparethecool.com
+/  /index.html  200
+/:country  /:country.html  200
+/:country/best/:slug  /:country/best/:slug.html  200
+/:country/p/:slug  /:country/p/:slug.html  200
+/:country/blog  /:country/blog.html  200
+/:country/blog/:slug  /:country/blog/:slug.html  200
+/:country/privacy  /:country/privacy.html  200
+/:country/terms  /:country/terms.html  200
+/:country/disclosure  /:country/disclosure.html  200
 https://comparetheheat.com/*  https://comparethecool.com/:splat  301!

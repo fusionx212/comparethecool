@@ -33,7 +33,15 @@ export type CategorySlug =
   | "air-quality-monitors"
   | "cooling-gadgets"
   | "portable-power"
-  | "misting-systems";
+  | "misting-systems"
+  | "fridges-freezers"
+  | "chest-freezers"
+  | "wine-coolers"
+  | "mini-fridges"
+  | "tumble-dryers"
+  | "ceiling-fans"
+  | "patio-heaters"
+  | "towel-radiators";
 
 export interface Retailer {
   id: string; // e.g. "currys"
@@ -58,15 +66,25 @@ export interface PricePoint {
   price: number;
 }
 
+export interface ProductSpecs {
+  noise_db?: number | null;
+  energy_rating?: string | null; // e.g. "A", "A+", "B"
+  weight_kg?: number | null;
+  dimensions?: string | null; // e.g. "45 × 38 × 70 cm"
+  cooling_power_w?: number | null; // cooling output in Watts
+  heating_power_w?: number | null; // heating output (if heat pump)
+  features?: string[]; // key feature bullets
+  room_size_m2?: number | null; // recommended room size
+  btu?: number | null; // for AC / evaporative
+}
+
 export interface Product {
   id: string;
   slug: string;
   name: string;
   brand: string;
   category: CategorySlug;
-  btu?: number | null; // for AC / evaporative
-  coverageM2?: number | null; // manufacturer-rated room size
-  noise?: number | null; // dB
+  specs?: ProductSpecs;
   image?: string | null;
   highlights: string[]; // 2–4 plain selling points
   offers: Offer[];
@@ -74,6 +92,14 @@ export interface Product {
   season?: "summer" | "winter" | "all-year";
   popularity?: number; // GSC/Amazon click weight for sorting // for homepage seasonal pivot
   sample?: boolean; // true while showing seed data before live feeds connect
+}
+
+// Detailed editorial content for a product page
+export interface ProductEditorial {
+  pros: string[];
+  cons: string[];
+  verdict: string; // editorial recommendation body
+  rating: number; // 1–5 star rating
 }
 
 // Diff-engine events that drive emails, badges and content refresh.

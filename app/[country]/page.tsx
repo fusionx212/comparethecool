@@ -38,6 +38,12 @@ export default async function CountryHome({ params }: { params: Promise<{ countr
           >
             Best Air Purifiers
           </Link>
+          <Link
+            href={`/${code}/best/fridges-freezers`}
+            className="rounded-none border border-foreground px-6 py-3 text-sm font-bold text-foreground hover:border-brand hover:text-brand"
+          >
+            Best Fridges & Freezers
+          </Link>
         </div>
       </div>
 
@@ -50,6 +56,14 @@ export default async function CountryHome({ params }: { params: Promise<{ countr
           <CategoryCard code={code} slug="tower-fans" label="Tower Fans" />
           <CategoryCard code={code} slug="evaporative-coolers" label="Evaporative Coolers" />
           <CategoryCard code={code} slug="electric-blankets" label="Electric Blankets" />
+          <CategoryCard code={code} slug="fridges-freezers" label="Fridges & Freezers" />
+          <CategoryCard code={code} slug="chest-freezers" label="Chest Freezers" />
+          <CategoryCard code={code} slug="wine-coolers" label="Wine Coolers" />
+          <CategoryCard code={code} slug="mini-fridges" label="Mini Fridges" />
+          <CategoryCard code={code} slug="tumble-dryers" label="Tumble Dryers" />
+          <CategoryCard code={code} slug="ceiling-fans" label="Ceiling Fans" />
+          <CategoryCard code={code} slug="patio-heaters" label="Patio Heaters" />
+          <CategoryCard code={code} slug="towel-radiators" label="Towel Radiators" />
         </div>
       </section>
 
