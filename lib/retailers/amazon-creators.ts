@@ -140,7 +140,17 @@ export async function creatorsGetItemsStock(
     });
     const data = (await res.json()) as {
       itemsResult?: { items?: Array<Record<string, unknown>> };
+      errors?: Array<{ message?: string }>;
+      message?: string;
+      reason?: string;
     };
+    if (!res.ok || data.reason === "InvalidAssociate") {
+      const msg =
+        data.errors?.[0]?.message ||
+        data.message ||
+        `Creators getItems HTTP ${res.status}`;
+      throw new Error(msg);
+    }
     const found = new Set<string>();
     for (const item of data.itemsResult?.items || []) {
       const asin = String(item.asin || "");
