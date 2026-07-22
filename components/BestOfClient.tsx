@@ -21,7 +21,7 @@ function dealOptions(
     return [
       {
         id: "amazon",
-        label: "Check today's price",
+        label: "Buy",
         priceLabel: `${currencySymbol}${p.amazonPrice.toFixed(2)}`,
         href: p.amazonUrl,
         hint: `Opens ${marketplaceHint}`,
@@ -32,7 +32,7 @@ function dealOptions(
     return [
       {
         id: "ebay",
-        label: "Check today's price",
+        label: "Buy",
         priceLabel: `${currencySymbol}${p.ebayPrice.toFixed(2)}`,
         href: p.ebayUrl,
         hint: "Opens local marketplace",
@@ -95,120 +95,123 @@ export function BestOfClient({
 
   return (
     <div>
-      {/* Filters */}
-      <section className="mt-8 border border-line bg-surface p-4 md:p-5">
-        <p className="eyebrow text-foreground/50">Filter &amp; sort</p>
-        <div className="mt-3 grid gap-3 md:grid-cols-4">
-          <label className="block text-sm">
-            <span className="text-foreground/60">Search</span>
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Brand or model"
-              className="mt-1 w-full border border-line bg-background px-3 py-2"
-            />
-          </label>
-          <label className="block text-sm">
-            <span className="text-foreground/60">Brand</span>
-            <select
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
-              className="mt-1 w-full border border-line bg-background px-3 py-2"
-            >
-              <option value="all">All brands</option>
-              {brands.map((b) => (
-                <option key={b} value={b}>
-                  {b}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-sm">
-            <span className="text-foreground/60">Max price</span>
-            <select
-              value={maxPrice === "all" ? "all" : String(maxPrice)}
-              onChange={(e) =>
-                setMaxPrice(e.target.value === "all" ? "all" : Number(e.target.value))
-              }
-              className="mt-1 w-full border border-line bg-background px-3 py-2"
-            >
-              <option value="all">Any</option>
-              {[100, 200, 300, 400, 500, 750, priceCeiling].map((n) => (
-                <option key={n} value={n}>
-                  Under {currencySymbol}
-                  {n}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-sm">
-            <span className="text-foreground/60">Sort</span>
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as SortKey)}
-              className="mt-1 w-full border border-line bg-background px-3 py-2"
-            >
-              <option value="recommended">Recommended</option>
-              <option value="price-asc">Price · low to high</option>
-              <option value="price-desc">Price · high to low</option>
-              <option value="rating">Highest rated</option>
-            </select>
-          </label>
-        </div>
-        <p className="mt-3 text-xs text-foreground/50">
-          Showing {filtered.length} of {products.length}
-        </p>
-      </section>
-
-      {/* Top 3 */}
+      {/* Top 3 first — land → buy without scrolling past filters */}
       {top.length > 0 && (
-        <section className="mt-10 border border-line bg-surface">
+        <section id="top-picks" className="mt-8 border border-line bg-surface">
           <div className="border-b border-line px-5 py-3">
-            <p className="eyebrow text-foreground/50">Top picks</p>
+            <p className="eyebrow text-brand">Top picks · buy now</p>
+            <h2 className="text-lg font-bold">Choose one and go</h2>
           </div>
           <div className="grid gap-0 md:grid-cols-3">
             {top.map((p, i) => {
               const badge = badges[i] || `Pick #${i + 1}`;
               const isBestValue = badge === "Best value";
               return (
-              <RevealCard key={p.id} vibe="cool" index={i}>
-              <div
-                className={`flex flex-col gap-3 p-5 ${i < top.length - 1 ? "border-b border-line md:border-b-0 md:border-r" : ""}`}
-              >
-                <ProductImage
-                  name={p.name}
-                  image={p.image}
-                  category={p.category}
-                  amazonAsin={p.amazonAsin}
-                  className="aspect-square w-full"
-                />
-                {isBestValue ? (
-                  <BestValueBadge vibe="cool">{badge}</BestValueBadge>
-                ) : (
-                  <p className="eyebrow text-brand">{badge}</p>
-                )}
-                <h3 className="text-lg font-bold leading-snug">
-                  <Link href={`/${code}/p/${p.slug}`} className="hover:text-brand">
-                    {p.name}
-                  </Link>
-                </h3>
-                <p className="tnum text-2xl font-bold text-brand">
-                  {currencySymbol}
-                  {(p.price ?? 0).toFixed(2)}
-                </p>
-                <p className="text-sm text-foreground/70 line-clamp-3">{p.verdict}</p>
-                <DealActions
-                  country={code}
-                  productSlug={p.slug}
-                  options={dealOptions(p, currencySymbol, marketplaceHint)}
-                  primaryLabel="See deals"
-                />
-              </div>
-              </RevealCard>
-            )})}
+                <RevealCard key={p.id} vibe="cool" index={i}>
+                  <div
+                    className={`flex flex-col gap-3 p-5 ${i < top.length - 1 ? "border-b border-line md:border-b-0 md:border-r" : ""}`}
+                  >
+                    <ProductImage
+                      name={p.name}
+                      image={p.image}
+                      category={p.category}
+                      amazonAsin={p.amazonAsin}
+                      className="aspect-square w-full"
+                    />
+                    {isBestValue ? (
+                      <BestValueBadge vibe="cool">{badge}</BestValueBadge>
+                    ) : (
+                      <p className="eyebrow text-brand">{badge}</p>
+                    )}
+                    <h3 className="text-lg font-bold leading-snug">
+                      <Link href={`/${code}/p/${p.slug}`} className="hover:text-brand">
+                        {p.name}
+                      </Link>
+                    </h3>
+                    <p className="tnum text-2xl font-bold text-brand">
+                      {currencySymbol}
+                      {(p.price ?? 0).toFixed(2)}
+                    </p>
+                    <p className="text-sm text-foreground/70 line-clamp-3">{p.verdict}</p>
+                    <DealActions
+                      country={code}
+                      productSlug={p.slug}
+                      options={dealOptions(p, currencySymbol, marketplaceHint)}
+                      primaryLabel="Buy now"
+                    />
+                  </div>
+                </RevealCard>
+              );
+            })}
           </div>
         </section>
       )}
+
+      {/* Filters — secondary, after the buy path */}
+      <details className="mt-8 border border-line bg-surface">
+        <summary className="cursor-pointer px-5 py-4 text-sm font-semibold text-foreground/70 hover:text-brand">
+          Filter &amp; sort · {filtered.length} of {products.length} shown
+        </summary>
+        <div className="border-t border-line p-4 md:p-5">
+          <div className="grid gap-3 md:grid-cols-4">
+            <label className="block text-sm">
+              <span className="text-foreground/60">Search</span>
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Brand or model"
+                className="mt-1 w-full border border-line bg-background px-3 py-2"
+              />
+            </label>
+            <label className="block text-sm">
+              <span className="text-foreground/60">Brand</span>
+              <select
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+                className="mt-1 w-full border border-line bg-background px-3 py-2"
+              >
+                <option value="all">All brands</option>
+                {brands.map((b) => (
+                  <option key={b} value={b}>
+                    {b}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block text-sm">
+              <span className="text-foreground/60">Max price</span>
+              <select
+                value={maxPrice === "all" ? "all" : String(maxPrice)}
+                onChange={(e) =>
+                  setMaxPrice(e.target.value === "all" ? "all" : Number(e.target.value))
+                }
+                className="mt-1 w-full border border-line bg-background px-3 py-2"
+              >
+                <option value="all">Any</option>
+                {[100, 200, 300, 400, 500, 750, priceCeiling].map((n) => (
+                  <option key={n} value={n}>
+                    Under {currencySymbol}
+                    {n}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block text-sm">
+              <span className="text-foreground/60">Sort</span>
+              <select
+                value={sort}
+                onChange={(e) => setSort(e.target.value as SortKey)}
+                className="mt-1 w-full border border-line bg-background px-3 py-2"
+              >
+                <option value="recommended">Recommended</option>
+                <option value="price-asc">Price · low to high</option>
+                <option value="price-desc">Price · high to low</option>
+                <option value="rating">Highest rated</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      </details>
 
       {/* Compare table */}
       <section id="compare" className="mt-12 overflow-x-auto border border-line bg-surface">
@@ -270,7 +273,7 @@ export function BestOfClient({
                       country={code}
                       productSlug={p.slug}
                       options={dealOptions(p, currencySymbol, marketplaceHint)}
-                      primaryLabel="Deals"
+                      primaryLabel="Buy"
                       compact
                     />
                   </td>
@@ -338,6 +341,7 @@ export function BestOfClient({
                     country={code}
                     productSlug={p.slug}
                     options={dealOptions(p, currencySymbol, marketplaceHint)}
+                    primaryLabel="Buy"
                   />
                 </div>
               </div>

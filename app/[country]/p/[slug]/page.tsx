@@ -125,7 +125,7 @@ export default async function ProductPage({
             country={code}
             productSlug={data.slug}
             options={dealOptions}
-            primaryLabel="Check today's price"
+            primaryLabel="Buy now"
           />
         </div>
       </div>
@@ -254,7 +254,7 @@ export default async function ProductPage({
             country={code}
             productSlug={data.slug}
             options={dealOptions}
-            primaryLabel="See deals"
+            primaryLabel="Buy"
           />
         </div>
       )}

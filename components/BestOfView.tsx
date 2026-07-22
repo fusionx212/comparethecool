@@ -41,22 +41,22 @@ export async function BestOfView({
       </h1>
       <p className="mt-3 max-w-3xl text-foreground/70">
         {review?.intro?.[0] ||
-          `Independent picks for ${cc.name}. Filter, compare, then check today's price when you are ready.`}
+          `Independent picks for ${cc.name}. Choose a top pick and buy — or compare the full list.`}
       </p>
 
       <div className="mt-6 flex flex-wrap gap-3">
         <a
-          href="#compare"
+          href="#top-picks"
           className="bg-brand px-5 py-3 text-sm font-bold text-white hover:brightness-110"
         >
-          Jump to comparison
+          Jump to top buys
         </a>
-        <Link
-          href={`/${code}/tools/btu-calculator`}
+        <a
+          href="#compare"
           className="border border-foreground px-5 py-3 text-sm font-bold hover:border-brand hover:text-brand"
         >
-          BTU calculator
-        </Link>
+          Full comparison
+        </a>
       </div>
 
       <BestOfClient

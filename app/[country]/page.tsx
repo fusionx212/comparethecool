@@ -7,6 +7,11 @@ import {
   HEATING_CATEGORIES,
 } from "@/lib/catalog/contract";
 import type { CategorySlug } from "@/lib/types";
+import { getProducts } from "@/lib/catalog/products";
+import { toBestOfDTO } from "@/lib/best-of-dto";
+import { categoryPhoto } from "@/lib/product-image";
+import { primaryCategoryFor, isCoolingSeason } from "@/lib/season";
+import { HomeTopBuys } from "@/components/HomeTopBuys";
 
 export const revalidate = 3600;
 export const dynamic = "force-static";
@@ -16,9 +21,7 @@ export function generateStaticParams() {
 }
 
 function orderedCategories(code: string): { slug: CategorySlug; label: string; lane: string }[] {
-  const month = new Date().getUTCMonth();
-  const southern = code === "au";
-  const coolingSeason = southern ? month >= 9 || month <= 2 : month >= 3 && month <= 8;
+  const coolingSeason = isCoolingSeason(code);
 
   const primary = (coolingSeason ? COOLING_CATEGORIES : HEATING_CATEGORIES).map((slug) => ({
     slug,
@@ -50,48 +53,55 @@ export default async function CountryHome({ params }: { params: Promise<{ countr
   const { country: code } = await params;
   const cc = getCountry(code);
   const cats = orderedCategories(code);
-  const featured = cats.slice(0, 4);
+  const primarySlug = primaryCategoryFor(code);
+  const primaryLabel = CATEGORY_LABELS[primarySlug] || primarySlug;
+  const topRows = await getProducts(code, primarySlug);
+  const topDtos = topRows.slice(0, 3).map((p) => {
+    const dto = toBestOfDTO(p, code);
+    if (!dto.image) dto.image = categoryPhoto(dto.category);
+    return dto;
+  });
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-12">
-      <div className="mb-10 ouac-grid border border-line bg-surface p-8 md:p-10">
+      <div className="mb-8 ouac-grid border border-line bg-surface p-8 md:p-10">
         <p className="eyebrow mb-2 text-foreground/60">{cc.name}</p>
         <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
-          Best cooling &amp; heating products in {cc.name}
+          Best {primaryLabel.toLowerCase()} in {cc.name}
         </h1>
         <p className="mt-3 max-w-2xl text-foreground/70">
-          Expert picks for cooling and heating in {cc.name} — year-round guides, not a one-season
-          spike.
+          Today&apos;s top picks — choose one and check the price.
         </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          {featured.map((c) => (
-            <Link
-              key={c.slug}
-              href={`/${code}/best/${c.slug}`}
-              className="bg-brand px-5 py-3 text-sm font-bold text-white hover:brightness-110"
-            >
-              Best {c.label}
-            </Link>
-          ))}
-        </div>
-        <div className="mt-4 flex flex-wrap gap-3">
+        <div className="mt-6 flex flex-wrap gap-3">
+          <a
+            href="#top-buys"
+            className="bg-brand px-5 py-3 text-sm font-bold text-white hover:brightness-110"
+          >
+            Jump to top buys
+          </a>
           <Link
-            href={`/${code}/tools/btu-calculator`}
+            href={`/${code}/best/${primarySlug}`}
             className="border border-foreground px-5 py-3 text-sm font-bold hover:border-brand hover:text-brand"
           >
-            BTU calculator
-          </Link>
-          <Link
-            href={`/${code}/tools/running-cost`}
-            className="border border-foreground px-5 py-3 text-sm font-bold hover:border-brand hover:text-brand"
-          >
-            Running-cost calculator
+            Full comparison
           </Link>
         </div>
       </div>
 
-      <section>
-        <h2 className="text-2xl font-bold tracking-tight">Categories</h2>
+      <HomeTopBuys
+        code={code}
+        currencySymbol={cc.currencySymbol}
+        marketplaceHint={cc.amazonMarketplace.replace("www.", "")}
+        categorySlug={primarySlug}
+        categoryLabel={primaryLabel}
+        products={topDtos}
+      />
+
+      <section className="mt-14">
+        <h2 className="text-2xl font-bold tracking-tight">Browse categories</h2>
+        <p className="mt-2 text-sm text-foreground/60">
+          One tap into a list · one tap to buy
+        </p>
         <div className="mt-6 grid gap-0 border border-line sm:grid-cols-2 lg:grid-cols-3">
           {cats.map((cat) => (
             <Link
@@ -111,7 +121,7 @@ export default async function CountryHome({ params }: { params: Promise<{ countr
                   <span className="eyebrow text-foreground/40">{cat.lane}</span>
                   <span className="mt-1 block font-bold group-hover:text-brand">{cat.label}</span>
                 </span>
-                <span className="text-sm text-foreground/50">Review →</span>
+                <span className="text-sm text-foreground/50">Shop →</span>
               </span>
             </Link>
           ))}
@@ -119,16 +129,31 @@ export default async function CountryHome({ params }: { params: Promise<{ countr
       </section>
 
       <section className="mt-12">
-        <h2 className="text-2xl font-bold tracking-tight">Resources</h2>
+        <h2 className="text-2xl font-bold tracking-tight">Tools &amp; info</h2>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link href={`/${code}/blog`} className="border border-line bg-surface px-5 py-3 text-sm font-semibold hover:border-brand hover:text-brand">
-            Blog &amp; articles
+          <Link
+            href={`/${code}/tools/btu-calculator`}
+            className="border border-line bg-surface px-5 py-3 text-sm font-semibold hover:border-brand hover:text-brand"
+          >
+            BTU calculator
           </Link>
-          <Link href={`/${code}/disclosure`} className="border border-line bg-surface px-5 py-3 text-sm font-semibold text-foreground/60 hover:border-brand hover:text-brand">
-            Affiliate disclosure
+          <Link
+            href={`/${code}/tools/running-cost`}
+            className="border border-line bg-surface px-5 py-3 text-sm font-semibold hover:border-brand hover:text-brand"
+          >
+            Running-cost calculator
           </Link>
-          <Link href={`/${code}/privacy`} className="border border-line bg-surface px-5 py-3 text-sm font-semibold text-foreground/60 hover:border-brand hover:text-brand">
-            Privacy
+          <Link
+            href={`/${code}/blog`}
+            className="border border-line bg-surface px-5 py-3 text-sm font-semibold hover:border-brand hover:text-brand"
+          >
+            Guides
+          </Link>
+          <Link
+            href={`/${code}/disclosure`}
+            className="border border-line bg-surface px-5 py-3 text-sm font-semibold text-foreground/60 hover:border-brand hover:text-brand"
+          >
+            Disclosure
           </Link>
         </div>
       </section>
