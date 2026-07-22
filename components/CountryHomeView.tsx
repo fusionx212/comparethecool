@@ -186,7 +186,7 @@ export async function renderCountryHome(code: string, brand: SiteBrand) {
               <img
                 src={categoryHeroPath(cat.slug)}
                 alt=""
-                className="aspect-[4/3] w-full object-cover bg-surface-cool"
+                className="aspect-[4/3] w-full object-contain object-center bg-surface-cool p-2"
                 loading="lazy"
               />
               <span className="flex items-center justify-between px-5 py-4">

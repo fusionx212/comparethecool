@@ -22,12 +22,12 @@ export function ProductImage({
   const [src, setSrc] = useState(primary);
 
   return (
-    <div className={`relative flex items-center justify-center overflow-hidden bg-surface-cool ${className}`}>
+    <div className={`relative flex items-center justify-center overflow-hidden bg-surface-cool p-3 ${className}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt={name}
-        className="h-full w-full object-cover"
+        className="max-h-full max-w-full object-contain"
         loading="lazy"
         onError={() => {
           if (src === LOCAL_FALLBACK) return;

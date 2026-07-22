@@ -87,7 +87,7 @@ export function CategoryShowroom({
             <img
               src={imageSrc}
               alt={imageAlt}
-              className="aspect-[4/3] w-full object-cover shadow-[0_28px_60px_-24px_rgba(0,0,0,0.45)]"
+              className="aspect-[4/3] w-full object-contain object-center shadow-[0_28px_60px_-24px_rgba(0,0,0,0.45)]"
               draggable={false}
             />
             <div
