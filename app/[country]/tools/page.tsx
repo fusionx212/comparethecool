@@ -20,6 +20,10 @@ export default async function ToolsIndex({
         ← {cc.name}
       </Link>
       <h1 className="mt-4 text-3xl font-bold">Free tools — {cc.name}</h1>
+      <p className="mt-2 text-sm text-foreground/60">
+        Free calculators below. Paid Room Fit / Setup / Running Cost PDFs live on the
+        country home next to Buy now.
+      </p>
       <div className="mt-8 grid gap-0 border border-line">
         <Link
           href={`/${country}/tools/btu-calculator`}

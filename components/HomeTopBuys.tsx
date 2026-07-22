@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { BestOfProductDTO } from "@/lib/best-of-dto";
 import { ProductImage } from "@/components/ProductImage";
 import { DealActions, type DealOption } from "@/components/DealActions";
+import { DigitalUpsellInline } from "@/components/DigitalUpsell";
 
 function dealOptions(
   p: BestOfProductDTO,
@@ -100,6 +101,12 @@ export function HomeTopBuys({
               productSlug={p.slug}
               options={dealOptions(p, currencySymbol, marketplaceHint)}
               primaryLabel="Buy now"
+            />
+            <DigitalUpsellInline
+              country={code}
+              category={categorySlug}
+              productSlug={p.slug}
+              currencySymbol={currencySymbol}
             />
           </div>
         ))}

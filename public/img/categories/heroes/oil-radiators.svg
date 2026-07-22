@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fdf0e8"/>
+      <stop offset="100%" stop-color="#f5c9a8"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="50%" cy="35%" r="45%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="8"/></filter>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <ellipse cx="400" cy="520" rx="260" ry="36" fill="#e85d1c" opacity="0.18" filter="url(#soft)"/>
+  <ellipse cx="400" cy="515" rx="200" ry="18" fill="#e85d1c" opacity="0.25"/>
+  <rect width="800" height="600" fill="url(#spot)"/>
+  <g transform="translate(0,-20)">
+    <g stroke="#e85d1c" stroke-width="14" fill="none" stroke-linecap="round"><path d="M300 480 Q300 220 318 200"/><path d="M336 480 Q336 220 354 200"/><path d="M372 480 Q372 220 390 200"/><path d="M408 480 Q408 220 426 200"/><path d="M444 480 Q444 220 462 200"/><path d="M480 480 Q480 220 498 200"/></g><rect x="290" y="470" width="220" height="30" rx="8" fill="#f4f8fa" stroke="#e85d1c" stroke-width="3"/>
+  </g>
+  <circle cx="120" cy="100" r="40" fill="#e85d1c" opacity="0.12"/>
+  <circle cx="680" cy="140" r="60" fill="#e85d1c" opacity="0.08"/>
+</svg>

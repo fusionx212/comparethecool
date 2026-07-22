@@ -9,9 +9,15 @@ import {
 import type { CategorySlug } from "@/lib/types";
 import { getProducts } from "@/lib/catalog/products";
 import { toBestOfDTO } from "@/lib/best-of-dto";
-import { categoryPhoto } from "@/lib/product-image";
+import { categoryPhoto, resolveProductImage } from "@/lib/product-image";
 import { primaryCategoryFor, isCoolingSeason } from "@/lib/season";
 import { HomeTopBuys } from "@/components/HomeTopBuys";
+import { CategoryShowroom } from "@/components/CategoryShowroom";
+import { DigitalUpsellStrip } from "@/components/DigitalUpsell";
+import {
+  CATEGORY_SPEC_HINTS,
+  categoryHeroPath,
+} from "@/lib/category-heroes";
 
 export const revalidate = 3600;
 export const dynamic = "force-static";
@@ -49,6 +55,30 @@ function orderedCategories(code: string): { slug: CategorySlug; label: string; l
   return out;
 }
 
+function showroomSpecs(
+  row: Awaited<ReturnType<typeof getProducts>>[number] | undefined,
+  category: string,
+): { label: string; value: string }[] {
+  const specs = row?.data.specs;
+  const live: { label: string; value: string }[] = [];
+  if (specs?.btu != null) live.push({ label: "BTU", value: specs.btu.toLocaleString() });
+  if (specs?.room_size_m2 != null) {
+    live.push({ label: "Room", value: `Up to ${specs.room_size_m2} m²` });
+  }
+  if (specs?.cooling_power_w != null) {
+    live.push({ label: "Cooling", value: `${specs.cooling_power_w} W` });
+  }
+  if (specs?.heating_power_w != null) {
+    live.push({ label: "Heating", value: `${specs.heating_power_w} W` });
+  }
+  if (specs?.noise_db != null) live.push({ label: "Noise", value: `${specs.noise_db} dB` });
+  if (specs?.energy_rating) live.push({ label: "Energy", value: specs.energy_rating });
+  if (live.length >= 2) return live.slice(0, 3);
+
+  const hints = CATEGORY_SPEC_HINTS[category] || [];
+  return hints.map((h) => ({ label: h.label, value: h.placeholder }));
+}
+
 export default async function CountryHome({ params }: { params: Promise<{ country: string }> }) {
   const { country: code } = await params;
   const cc = getCountry(code);
@@ -61,6 +91,22 @@ export default async function CountryHome({ params }: { params: Promise<{ countr
     if (!dto.image) dto.image = categoryPhoto(dto.category);
     return dto;
   });
+
+  const heroProduct = topRows[0];
+  const productImg = heroProduct
+    ? resolveProductImage({
+        image: heroProduct.image || heroProduct.data.image,
+        category: primarySlug,
+        amazonAsin: heroProduct.data.amazon_asin,
+      })
+    : null;
+  const stageImage =
+    productImg &&
+    (productImg.includes("amazon") || productImg.includes("ebayimg"))
+      ? productImg
+      : categoryHeroPath(primarySlug);
+
+  const specs = showroomSpecs(heroProduct, primarySlug);
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-12">
@@ -97,6 +143,28 @@ export default async function CountryHome({ params }: { params: Promise<{ countr
         products={topDtos}
       />
 
+      <div className="mt-10">
+        <CategoryShowroom
+          title={heroProduct?.data.name || primaryLabel}
+          subtitle={
+            heroProduct
+              ? `Example from today’s ${primaryLabel.toLowerCase()} shortlist`
+              : `Explore ${primaryLabel.toLowerCase()}`
+          }
+          imageSrc={stageImage}
+          imageAlt={heroProduct?.data.name || primaryLabel}
+          specs={specs}
+        />
+      </div>
+
+      <div className="mt-10">
+        <DigitalUpsellStrip
+          country={code}
+          category={primarySlug}
+          currencySymbol={cc.currencySymbol}
+        />
+      </div>
+
       <section className="mt-14">
         <h2 className="text-2xl font-bold tracking-tight">Browse categories</h2>
         <p className="mt-2 text-sm text-foreground/60">
@@ -111,7 +179,7 @@ export default async function CountryHome({ params }: { params: Promise<{ countr
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={`/img/categories/${cat.slug}.svg`}
+                src={categoryHeroPath(cat.slug)}
                 alt=""
                 className="aspect-[4/3] w-full object-cover bg-surface-cool"
                 loading="lazy"

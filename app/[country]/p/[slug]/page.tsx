@@ -9,6 +9,7 @@ import { SEED_CATALOG } from "@/lib/catalog/seed-data";
 import { wrapOfferUrl } from "@/lib/affiliate";
 import { ProductImage } from "@/components/ProductImage";
 import { DealActions } from "@/components/DealActions";
+import { DigitalUpsellInline } from "@/components/DigitalUpsell";
 import { categoryPhoto } from "@/lib/product-image";
 
 export const revalidate = 3600;
@@ -126,6 +127,12 @@ export default async function ProductPage({
             productSlug={data.slug}
             options={dealOptions}
             primaryLabel="Buy now"
+          />
+          <DigitalUpsellInline
+            country={code}
+            category={data.category}
+            productSlug={data.slug}
+            currencySymbol={cc.currencySymbol}
           />
         </div>
       </div>

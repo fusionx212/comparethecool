@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -29,22 +30,21 @@ export const metadata: Metadata = {
 const SITE_BOOT =
   `(function(){try{var h=location.hostname.toLowerCase();document.documentElement.dataset.site=h.indexOf("comparetheheat")>=0?"heat":"cool";}catch(e){}})();`;
 
-const GSAP_BOOT = {
-  __html: `window.gsapCdn||(function(w,d,s,l,p){w[l]=w[l]||[];w[l].push({'gtm.start':+new Date});
-  var f=d.getElementsByTagName(s)[0],j=d.createElement(s);
-  j.src='https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
-  j.onload=function(){var s2=d.createElement('script');s2.src='https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js';d.head.appendChild(s2);};
-  f.parentNode.insertBefore(j,f);})(window,document,'script','gsapDataLayer');`,
-};
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`} data-site="cool">
       <head>
         <script dangerouslySetInnerHTML={{ __html: SITE_BOOT }} />
-        <script dangerouslySetInnerHTML={GSAP_BOOT} />
       </head>
       <body className="flex min-h-full flex-col">
+        <Script
+          src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
+          strategy="afterInteractive"
+        />
+        <Script
+          src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"
+          strategy="afterInteractive"
+        />
         <GsapInit />
         <SiteSchema />
         <HeatStrip />
