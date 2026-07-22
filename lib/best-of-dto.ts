@@ -1,6 +1,7 @@
 import type { CatalogRow } from "@/lib/catalog/contract";
 import type { StockStatus } from "@/lib/types";
 import { wrapOfferUrl } from "@/lib/affiliate";
+import type { SiteBrand } from "@/lib/site-brand";
 
 export type BestOfProductDTO = {
   id: string;
@@ -23,7 +24,11 @@ export type BestOfProductDTO = {
   ebayUrl: string | null;
 };
 
-export function toBestOfDTO(row: CatalogRow, code: string): BestOfProductDTO {
+export function toBestOfDTO(
+  row: CatalogRow,
+  code: string,
+  siteBrand?: SiteBrand,
+): BestOfProductDTO {
   const amazon = row.data.offers.find((o) => o.retailer.id === "amazon");
   const ebay = row.data.offers.find((o) => o.retailer.id === "ebay");
   return {
@@ -44,10 +49,10 @@ export function toBestOfDTO(row: CatalogRow, code: string): BestOfProductDTO {
     amazonPrice: amazon?.price ?? null,
     ebayPrice: ebay?.price ?? null,
     amazonUrl: amazon
-      ? wrapOfferUrl(code, "amazon", amazon.url, row.data.amazon_asin)
+      ? wrapOfferUrl(code, "amazon", amazon.url, row.data.amazon_asin, null, siteBrand)
       : null,
     ebayUrl: ebay
-      ? wrapOfferUrl(code, "ebay", ebay.url, null, row.data.ebay_item_id)
+      ? wrapOfferUrl(code, "ebay", ebay.url, null, row.data.ebay_item_id, siteBrand)
       : null,
   };
 }

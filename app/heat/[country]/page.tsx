@@ -7,8 +7,12 @@ export function generateStaticParams() {
   return countryStaticParams();
 }
 
-/** comparethecool.com — cooling-first catalog */
-export default async function CountryHome({ params }: { params: Promise<{ country: string }> }) {
+/** comparetheheat.com — heating-first catalog (rewritten from /{country}) */
+export default async function HeatCountryHome({
+  params,
+}: {
+  params: Promise<{ country: string }>;
+}) {
   const { country: code } = await params;
-  return renderCountryHome(code, "cool");
+  return renderCountryHome(code, "heat");
 }

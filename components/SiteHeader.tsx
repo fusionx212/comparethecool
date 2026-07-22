@@ -29,7 +29,10 @@ export function SiteHeader() {
             <Link href="/fr" className="text-sm text-foreground/70 hover:text-brand">FR</Link>
             <Link href="/us" className="text-sm text-foreground/70 hover:text-brand">US</Link>
             <Link href="/au" className="text-sm text-foreground/70 hover:text-brand">AU</Link>
-            <Link href="/uk/tools/btu-calculator" className="text-sm text-foreground/70 hover:text-brand">
+            <Link
+              href={heat ? "/uk/tools/running-cost" : "/uk/tools/btu-calculator"}
+              className="text-sm text-foreground/70 hover:text-brand"
+            >
               Tools
             </Link>
           </nav>

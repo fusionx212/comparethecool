@@ -9,6 +9,7 @@ import {
   getCountry,
   type CountryConfig,
 } from "@/lib/countries";
+import type { SiteBrand } from "@/lib/site-brand";
 
 export const EBAY_EPN_CAMPID = "5339164583";
 
@@ -16,9 +17,10 @@ export function amazonProductUrl(
   country: CountryConfig | string,
   asin: string,
   tagOverride?: string,
+  brand?: SiteBrand,
 ): string {
   const cc = typeof country === "string" ? getCountry(country) : country;
-  const tag = tagOverride || activeAmazonTag(cc);
+  const tag = tagOverride || activeAmazonTag(cc, brand);
   return `https://${cc.amazonMarketplace}/dp/${asin}?tag=${tag}`;
 }
 
@@ -75,17 +77,18 @@ export function wrapOfferUrl(
   url: string,
   asin?: string | null,
   ebayItemId?: string | null,
+  brand?: SiteBrand,
 ): string {
   const cc = typeof country === "string" ? getCountry(country) : country;
   if (retailerId === "amazon") {
-    if (asin) return amazonProductUrl(cc, asin);
+    if (asin) return amazonProductUrl(cc, asin, undefined, brand);
     try {
       const u = new URL(url);
       const pathAsin = u.pathname.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i)?.[1];
-      if (pathAsin) return amazonProductUrl(cc, pathAsin);
+      if (pathAsin) return amazonProductUrl(cc, pathAsin, undefined, brand);
       u.hostname = cc.amazonMarketplace;
       u.protocol = "https:";
-      u.searchParams.set("tag", activeAmazonTag(cc));
+      u.searchParams.set("tag", activeAmazonTag(cc, brand));
       return u.toString();
     } catch {
       return url;

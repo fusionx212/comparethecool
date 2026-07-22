@@ -92,20 +92,19 @@ export function countryFromHeader(cfCountry: string | null): string {
   return map[cfCountry || ""] || "uk";
 }
 
-/** Get active Amazon tag based on current season */
-export function activeAmazonTag(country: CountryConfig): string {
-  const now = new Date();
-  const month = now.getUTCMonth(); // 0=Jan, 11=Dec
-  // Northern hemisphere: cooling Apr-Sep, heating Oct-Mar
-  // Southern hemisphere (AU): opposite
-  const isSouthern = country.code === "au";
-  const isCoolingSeason = isSouthern
-    ? (month >= 9 || month <= 2)  // Oct-Mar = southern summer
-    : (month >= 3 && month <= 8); // Apr-Sep = northern summer
-  
+import type { SiteBrand } from "@/lib/site-brand";
+import { isCoolingSeason } from "@/lib/season";
+
+/** Get active Amazon tag — brand host wins over calendar season. */
+export function activeAmazonTag(
+  country: CountryConfig,
+  brand?: SiteBrand,
+): string {
+  if (brand === "heat") return country.amazonTagHeat;
+  if (brand === "cool") return country.amazonTagCool;
   if (country.season === "cooling") return country.amazonTagCool;
   if (country.season === "heating") return country.amazonTagHeat;
-  return isCoolingSeason ? country.amazonTagCool : country.amazonTagHeat;
+  return isCoolingSeason(country.code) ? country.amazonTagCool : country.amazonTagHeat;
 }
 
 export const SITE_NAME_COOL = "Compare the Cool";
