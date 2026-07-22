@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { HeroEntrance } from "@/components/HeroEntrance";
-
-export const dynamic = "force-static";
+import { HomeGeoRedirect } from "@/components/HomeGeoRedirect";
 
 export default function Home() {
   return (
     <HeroEntrance>
+      {/* Edge redirects most visitors; this covers local / bot / edge-bypass */}
+      <HomeGeoRedirect />
+
       <section className="ouac-grid border-b border-line bg-brand-ink text-white">
         <div className="mx-auto max-w-6xl px-5 py-20 md:py-28">
           <p className="eyebrow text-white/60">Compare the Cool · Compare the Heat</p>
@@ -15,8 +17,7 @@ export default function Home() {
             Expert reviews &amp; live prices
           </h1>
           <p className="mt-4 max-w-xl text-lg text-white/75">
-            Cooling, heating, and air-quality products across the UK, EU, US, and Australia —
-            year-round catalog, not a one-season spike.
+            Cooling, heating, and air-quality products across the UK, EU, US, and Australia.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/uk" className="bg-brand px-6 py-3 text-sm font-bold text-white hover:brightness-110">
@@ -30,6 +31,7 @@ export default function Home() {
       </section>
 
       <div className="mx-auto max-w-6xl px-5 py-16">
+        <p className="eyebrow mb-4 text-foreground/50">Or choose your country</p>
         <div className="grid gap-0 border border-line sm:grid-cols-2 lg:grid-cols-4">
           <CountryCard code="uk" name="United Kingdom" />
           <CountryCard code="de" name="Deutschland" />

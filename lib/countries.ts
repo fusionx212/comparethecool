@@ -81,11 +81,13 @@ export function getCountry(code: string): CountryConfig {
 
 export function countryFromHeader(cfCountry: string | null): string {
   const map: Record<string, string> = {
-    GB: "uk", DE: "de", FR: "fr", IT: "it", ES: "es", NL: "nl",
-    US: "us", AU: "au", NZ: "au",
-    AT: "de", CH: "de", BE: "nl", LU: "de", PL: "eu", SE: "eu",
-    DK: "eu", NO: "eu", FI: "eu", PT: "eu", GR: "eu", CZ: "eu",
-    IE: "uk", CA: "us",
+    GB: "uk", IE: "uk",
+    DE: "de", AT: "de", CH: "de", LU: "de",
+    FR: "fr", IT: "it", ES: "es",
+    NL: "nl", BE: "nl",
+    US: "us", CA: "us",
+    AU: "au", NZ: "au",
+    PL: "eu", SE: "eu", DK: "eu", NO: "eu", FI: "eu", PT: "eu", GR: "eu", CZ: "eu",
   };
   return map[cfCountry || ""] || "uk";
 }

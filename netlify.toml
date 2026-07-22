@@ -8,3 +8,7 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+[[edge_functions]]
+  function = "geo-home"
+  path = "/"
