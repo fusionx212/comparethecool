@@ -8,6 +8,8 @@
     "start": "next start",
     "seed:catalog": "npx tsx scripts/seed-catalog.ts",
     "check:affiliate": "node scripts/check-affiliate-readiness.mjs",
+    "check:links": "node scripts/check-affiliate-links.mjs",
+    "update:stock": "npx tsx scripts/update-stock.ts",
     "enrich:images": "npx tsx scripts/enrich-product-images.ts"
   },
   "dependencies": {

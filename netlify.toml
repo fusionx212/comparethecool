@@ -1,6 +1,7 @@
 [build]
   command = "npm run build"
   publish = ".next"
+  functions = "netlify/functions"
 
 [build.environment]
   NEXT_PUBLIC_SUPABASE_URL = "https://kfhttxayccwsuecfmbbz.supabase.co"

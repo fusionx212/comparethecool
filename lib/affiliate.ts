@@ -1,7 +1,6 @@
 /**
  * Affiliate URL wrappers — Amazon seasonal tags + eBay EPN.
- * eBay tracking: campid on URLs + EPN Smart Tools (layout) rewrite on click.
- * Campaign: EBAY_EPN_CAMPID (5339164583).
+ * Always force the shopper onto the local marketplace for their country path.
  */
 
 import {
@@ -10,15 +9,42 @@ import {
   type CountryConfig,
 } from "@/lib/countries";
 import type { SiteBrand } from "@/lib/site-brand";
+import { looksLikeRealAsin } from "@/lib/asin";
 
 export const EBAY_EPN_CAMPID = "5339164583";
+
+/** Local eBay hostname for a market — never ebay.us / ebay.au. */
+export function ebayHostFor(code: string): string {
+  switch (code) {
+    case "uk":
+      return "www.ebay.co.uk";
+    case "us":
+      return "www.ebay.com";
+    case "au":
+      return "www.ebay.com.au";
+    case "de":
+    case "eu":
+      return "www.ebay.de";
+    case "fr":
+      return "www.ebay.fr";
+    case "it":
+      return "www.ebay.it";
+    case "es":
+      return "www.ebay.es";
+    case "nl":
+      return "www.ebay.nl";
+    default:
+      return "www.ebay.co.uk";
+  }
+}
 
 export function amazonProductUrl(
   country: CountryConfig | string,
   asin: string,
   tagOverride?: string,
   brand?: SiteBrand,
-): string {
+): string | null {
+  if (!looksLikeRealAsin(asin)) return null;
   const cc = typeof country === "string" ? getCountry(country) : country;
   const tag = tagOverride || activeAmazonTag(cc, brand);
   return `https://${cc.amazonMarketplace}/dp/${asin}?tag=${tag}`;
@@ -29,15 +55,7 @@ export function ebayItemUrl(
   itemId: string,
 ): string {
   const cc = typeof country === "string" ? getCountry(country) : country;
-  const host =
-    cc.code === "uk"
-      ? "www.ebay.co.uk"
-      : cc.code === "us"
-        ? "www.ebay.com"
-        : cc.code === "au"
-          ? "www.ebay.com.au"
-          : `www.ebay.${cc.code === "de" ? "de" : cc.code === "fr" ? "fr" : cc.code === "it" ? "it" : cc.code === "es" ? "es" : cc.code === "nl" ? "nl" : "de"}`;
-  const u = new URL(`https://${host}/itm/${itemId}`);
+  const u = new URL(`https://${ebayHostFor(cc.code)}/itm/${itemId}`);
   u.searchParams.set("campid", EBAY_EPN_CAMPID);
   u.searchParams.set("customid", `ctc-${cc.code}`);
   u.searchParams.set("mkevt", "1");
@@ -51,15 +69,7 @@ export function ebaySearchUrl(
   query: string,
 ): string {
   const cc = typeof country === "string" ? getCountry(country) : country;
-  const host =
-    cc.code === "uk"
-      ? "www.ebay.co.uk"
-      : cc.code === "us"
-        ? "www.ebay.com"
-        : cc.code === "au"
-          ? "www.ebay.com.au"
-          : `www.ebay.${cc.code === "de" ? "de" : cc.code === "fr" ? "fr" : cc.code === "it" ? "it" : cc.code === "es" ? "es" : "de"}`;
-  const u = new URL(`https://${host}/sch/i.html`);
+  const u = new URL(`https://${ebayHostFor(cc.code)}/sch/i.html`);
   u.searchParams.set("_nkw", query);
   u.searchParams.set("campid", EBAY_EPN_CAMPID);
   u.searchParams.set("customid", `ctc-${cc.code}-search`);
@@ -78,49 +88,34 @@ export function wrapOfferUrl(
   asin?: string | null,
   ebayItemId?: string | null,
   brand?: SiteBrand,
-): string {
+): string | null {
   const cc = typeof country === "string" ? getCountry(country) : country;
   if (retailerId === "amazon") {
-    if (asin) return amazonProductUrl(cc, asin, undefined, brand);
-    try {
-      const u = new URL(url);
-      const pathAsin = u.pathname.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i)?.[1];
-      if (pathAsin) return amazonProductUrl(cc, pathAsin, undefined, brand);
-      u.hostname = cc.amazonMarketplace;
-      u.protocol = "https:";
-      u.searchParams.set("tag", activeAmazonTag(cc, brand));
-      return u.toString();
-    } catch {
-      return url;
-    }
+    const resolvedAsin =
+      (looksLikeRealAsin(asin) && asin) ||
+      url.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i)?.[1] ||
+      null;
+    if (!looksLikeRealAsin(resolvedAsin)) return null;
+    return amazonProductUrl(cc, resolvedAsin!, undefined, brand);
   }
   if (retailerId === "ebay") {
     if (ebayItemId) return ebayItemUrl(cc, ebayItemId);
     try {
       const u = new URL(url);
-      const local = new URL(ebaySearchUrl(cc, u.searchParams.get("_nkw") || "product"));
-      // Prefer item links on the local host when we already have /itm/
       if (/\/itm\//i.test(u.pathname)) {
-        const host =
-          cc.code === "uk"
-            ? "www.ebay.co.uk"
-            : cc.code === "us"
-              ? "www.ebay.com"
-              : cc.code === "au"
-                ? "www.ebay.com.au"
-                : `www.ebay.${cc.code === "de" ? "de" : cc.code === "fr" ? "fr" : cc.code === "it" ? "it" : cc.code === "es" ? "es" : cc.code === "nl" ? "nl" : "de"}`;
-        u.hostname = host;
+        const id = u.pathname.match(/\/itm\/([^/?#]+)/)?.[1];
+        if (id) return ebayItemUrl(cc, id);
+        u.hostname = ebayHostFor(cc.code);
         u.protocol = "https:";
         u.searchParams.set("campid", EBAY_EPN_CAMPID);
         u.searchParams.set("customid", `ctc-${cc.code}`);
         u.searchParams.set("mkevt", "1");
         return u.toString();
       }
-      local.searchParams.set("campid", EBAY_EPN_CAMPID);
-      local.searchParams.set("customid", `ctc-${cc.code}`);
-      return local.toString();
+      const q = u.searchParams.get("_nkw") || "product";
+      return ebaySearchUrl(cc, q);
     } catch {
-      return url;
+      return ebaySearchUrl(cc, "product");
     }
   }
   return url;

@@ -95,6 +95,98 @@ export async function creatorsGetItemsImages(
   return out;
 }
 
+export type CreatorsStockHit = {
+  asin: string;
+  status: "in_stock" | "out_of_stock" | "not_found";
+  price: number | null;
+  imageUrl: string | null;
+  title: string | null;
+};
+
+const STOCK_RESOURCES = [
+  "itemInfo.title",
+  "offersV2.listings.price",
+  "offersV2.listings.availability",
+  "images.primary.large",
+];
+
+/** Live Amazon availability + price for a marketplace (batches of 10). */
+export async function creatorsGetItemsStock(
+  asins: string[],
+  marketplace: string,
+  partnerTag: string,
+): Promise<Map<string, CreatorsStockHit>> {
+  const out = new Map<string, CreatorsStockHit>();
+  if (!asins.length) return out;
+  const token = await getAccessToken();
+
+  for (let i = 0; i < asins.length; i += 10) {
+    const batch = asins.slice(i, i + 10);
+    const res = await fetch("https://creatorsapi.amazon/catalog/v1/getItems", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "x-marketplace": marketplace,
+      },
+      body: JSON.stringify({
+        itemIds: batch,
+        itemIdType: "ASIN",
+        partnerTag,
+        partnerType: "Associates",
+        marketplace,
+        resources: STOCK_RESOURCES,
+      }),
+    });
+    const data = (await res.json()) as {
+      itemsResult?: { items?: Array<Record<string, unknown>> };
+    };
+    const found = new Set<string>();
+    for (const item of data.itemsResult?.items || []) {
+      const asin = String(item.asin || "");
+      if (!asin) continue;
+      found.add(asin);
+      const offersV2 = item.offersV2 as
+        | { listings?: Array<Record<string, unknown>> }
+        | undefined;
+      const listing = offersV2?.listings?.[0];
+      const avail = (listing?.availability || {}) as { type?: string; message?: string };
+      const money = (listing?.price as { money?: { amount?: number } } | undefined)?.money;
+      const atype = (avail.type || "").toUpperCase();
+      let status: CreatorsStockHit["status"] = "out_of_stock";
+      if (
+        atype === "AVAILABLE_DATE" ||
+        atype === "NOW" ||
+        atype === "IN_STOCK" ||
+        atype === "LEADTIME"
+      ) {
+        status = "in_stock";
+      }
+      out.set(asin, {
+        asin,
+        status,
+        price: typeof money?.amount === "number" ? money.amount : null,
+        imageUrl: extractImage(item),
+        title:
+          (item.itemInfo as { title?: { displayValue?: string } } | undefined)?.title
+            ?.displayValue || null,
+      });
+    }
+    for (const a of batch) {
+      if (!found.has(a)) {
+        out.set(a, {
+          asin: a,
+          status: "not_found",
+          price: null,
+          imageUrl: null,
+          title: null,
+        });
+      }
+    }
+  }
+  return out;
+}
+
 export async function creatorsSearchImage(
   keywords: string,
   marketplace: string,

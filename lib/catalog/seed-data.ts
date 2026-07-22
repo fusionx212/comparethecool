@@ -8,16 +8,19 @@ import type { CatalogRow, CatalogProductData } from "./contract";
 import type { CategorySlug, Offer } from "@/lib/types";
 import { amazonProductUrl, ebaySearchUrl } from "@/lib/affiliate";
 import { categoryPhoto } from "@/lib/product-image";
-import { imageForSlug } from "@/lib/catalog/image-cache";
+import { asinForSlug, imageForSlug } from "@/lib/catalog/image-cache";
 import { getCountry } from "@/lib/countries";
+import { looksLikeRealAsin } from "@/lib/asin";
 
 const NOW = "2026-07-21T10:00:00.000Z";
 
-function offerAmazon(code: string, asin: string, price: number): Offer {
+function offerAmazon(code: string, asin: string, price: number): Offer | null {
+  const url = amazonProductUrl(code, asin);
+  if (!url) return null;
   return {
     retailer: { id: "amazon", name: "Amazon" },
     price,
-    url: amazonProductUrl(code, asin),
+    url,
     status: "in_stock",
     lastChecked: NOW,
   };
@@ -289,9 +292,19 @@ function priceFor(def: SeedDef, code: string): number {
 
 function buildProduct(code: string, def: SeedDef): CatalogRow {
   const cc = getCountry(code === "eu" ? "de" : code);
-  const asin = def.asinByMarket[code] || def.asinByMarket.uk || def.asinByMarket.de || "B08FALLBACK";
+  const cachedAsin = asinForSlug(def.slug);
+  const rawAsin = def.asinByMarket[code] || null;
+  // Prefer enrich-cache ASIN for UK only — never stamp a UK ASIN onto DE/FR/US
+  const asin =
+    (looksLikeRealAsin(rawAsin) && rawAsin) ||
+    (code === "uk" && looksLikeRealAsin(cachedAsin) && cachedAsin) ||
+    null;
   const price = priceFor(def, code);
   const ebayPrice = Math.round(price * 0.97 * 100) / 100;
+  const amazonOffer = asin ? offerAmazon(cc.code, asin, price) : null;
+  const offers = [amazonOffer, offerEbay(cc.code, `${def.brand} ${def.name}`, ebayPrice)].filter(
+    Boolean,
+  ) as Offer[];
   const data: CatalogProductData = {
     slug: def.slug,
     name: def.name,
@@ -316,10 +329,7 @@ function buildProduct(code: string, def: SeedDef): CatalogRow {
       verdict: def.verdict,
       rating: def.rating,
     },
-    offers: [
-      offerAmazon(cc.code, asin, price),
-      offerEbay(cc.code, `${def.brand} ${def.name}`, ebayPrice),
-    ],
+    offers,
   };
   return row(code, data, price);
 }

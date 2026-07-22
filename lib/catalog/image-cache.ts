@@ -37,3 +37,8 @@ export function getProductImageCache(): Record<string, ProductImageEntry> {
 export function imageForSlug(slug: string): string | null {
   return getProductImageCache()[slug]?.image || null;
 }
+
+export function asinForSlug(slug: string): string | null {
+  const asin = getProductImageCache()[slug]?.asin || null;
+  return asin || null;
+}

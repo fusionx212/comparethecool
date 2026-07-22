@@ -2,6 +2,7 @@ import type { CatalogRow } from "@/lib/catalog/contract";
 import type { StockStatus } from "@/lib/types";
 import { wrapOfferUrl } from "@/lib/affiliate";
 import type { SiteBrand } from "@/lib/site-brand";
+import { looksLikeRealAsin } from "@/lib/asin";
 
 export type BestOfProductDTO = {
   id: string;
@@ -31,6 +32,14 @@ export function toBestOfDTO(
 ): BestOfProductDTO {
   const amazon = row.data.offers.find((o) => o.retailer.id === "amazon");
   const ebay = row.data.offers.find((o) => o.retailer.id === "ebay");
+  const asin = row.data.amazon_asin;
+  const amazonBuyable =
+    amazon &&
+    looksLikeRealAsin(asin) &&
+    amazon.status !== "out_of_stock" &&
+    row.stock_status !== "out_of_stock";
+  const ebayBuyable = ebay && ebay.status !== "out_of_stock";
+
   return {
     id: row.id,
     slug: row.data.slug,
@@ -38,7 +47,7 @@ export function toBestOfDTO(
     brand: row.data.brand,
     category: row.data.category,
     image: row.image || row.data.image || null,
-    amazonAsin: row.data.amazon_asin ?? null,
+    amazonAsin: looksLikeRealAsin(asin) ? (asin as string) : null,
     price: row.price,
     rating: row.data.rating ?? null,
     stockStatus: row.stock_status,
@@ -46,13 +55,13 @@ export function toBestOfDTO(
     pros: row.data.editorial?.pros || [],
     cons: row.data.editorial?.cons || [],
     highlights: row.data.highlights || [],
-    amazonPrice: amazon?.price ?? null,
-    ebayPrice: ebay?.price ?? null,
-    amazonUrl: amazon
-      ? wrapOfferUrl(code, "amazon", amazon.url, row.data.amazon_asin, null, siteBrand)
+    amazonPrice: amazonBuyable ? (amazon?.price ?? null) : null,
+    ebayPrice: ebayBuyable ? (ebay?.price ?? null) : null,
+    amazonUrl: amazonBuyable
+      ? wrapOfferUrl(code, "amazon", amazon!.url, asin, null, siteBrand)
       : null,
-    ebayUrl: ebay
-      ? wrapOfferUrl(code, "ebay", ebay.url, null, row.data.ebay_item_id, siteBrand)
+    ebayUrl: ebayBuyable
+      ? wrapOfferUrl(code, "ebay", ebay!.url, null, row.data.ebay_item_id, siteBrand)
       : null,
   };
 }

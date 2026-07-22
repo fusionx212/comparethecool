@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { getProductBySlug, getRelatedProducts } from "@/lib/catalog/products";
 import { SEED_CATALOG } from "@/lib/catalog/seed-data";
 import { wrapOfferUrl } from "@/lib/affiliate";
+import { looksLikeRealAsin } from "@/lib/asin";
 import { ProductImage } from "@/components/ProductImage";
 import { DealActions } from "@/components/DealActions";
 import { DigitalUpsellInline } from "@/components/DigitalUpsell";
@@ -50,12 +51,17 @@ export default async function ProductPage({
   const ebayOffer = offers.find((o) => o.retailer.id === "ebay");
   const alternatives = await getRelatedProducts(code, row.id, 4);
 
-  const amazonUrl = amazonOffer
-    ? wrapOfferUrl(code, "amazon", amazonOffer.url, data.amazon_asin)
-    : null;
-  const ebayUrl = ebayOffer
-    ? wrapOfferUrl(code, "ebay", ebayOffer.url, null, data.ebay_item_id)
-    : null;
+  const amazonUrl =
+    amazonOffer &&
+    looksLikeRealAsin(data.amazon_asin) &&
+    amazonOffer.status !== "out_of_stock" &&
+    row.stock_status !== "out_of_stock"
+      ? wrapOfferUrl(code, "amazon", amazonOffer.url, data.amazon_asin)
+      : null;
+  const ebayUrl =
+    ebayOffer && ebayOffer.status !== "out_of_stock"
+      ? wrapOfferUrl(code, "ebay", ebayOffer.url, null, data.ebay_item_id)
+      : null;
 
   // One local exit: Amazon for this country; eBay only if Amazon missing
   const dealOptions = (

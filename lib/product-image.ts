@@ -1,3 +1,5 @@
+import { looksLikeRealAsin } from "@/lib/asin";
+
 /**
  * Resolve a product image without LLM / paid APIs.
  * Prefer Amazon CDN (real ASIN) → hosted category art → default.
@@ -27,15 +29,6 @@ const CATEGORY_PHOTOS: Record<string, string> = {
 };
 
 const DEFAULT_PHOTO = "/img/categories/default.svg";
-
-function looksLikeRealAsin(asin: string | null | undefined): boolean {
-  if (!asin) return false;
-  if (asin.length !== 10) return false;
-  if (/XYZ|FALLBACK|COMFE|TROT|MEACO|PROB|LEVO|DYSON|DRAG|DIMP|DREAM|AM07|HONF/i.test(asin)) {
-    return false;
-  }
-  return /^[A-Z0-9]{10}$/i.test(asin);
-}
 
 function isTrustedRemoteImage(url: string): boolean {
   try {

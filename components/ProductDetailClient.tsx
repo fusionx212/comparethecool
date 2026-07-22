@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getCountry } from "@/lib/countries";
+import { amazonProductUrl, ebayItemUrl } from "@/lib/affiliate";
+import { looksLikeRealAsin } from "@/lib/asin";
 import {
   fetchProductBySlug,
   type ProductRecord,
@@ -145,24 +147,25 @@ export default function ProductDetailClient({
 
           {/* Buy buttons */}
           <div className="mt-6 flex flex-wrap gap-3">
-            {product.amazon_asin && (
+            {looksLikeRealAsin(product.amazon_asin) &&
+              amazonProductUrl(cc, product.amazon_asin!) && (
               <a
-                href={`https://${cc.amazonMarketplace}/dp/${product.amazon_asin}?tag=${cc.amazonTagCool}`}
+                href={amazonProductUrl(cc, product.amazon_asin!)!}
                 target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-none bg-[#FF9900] px-6 py-3 text-sm font-bold text-white hover:brightness-110"
+                rel="noopener sponsored nofollow"
+                className="rounded-none bg-brand px-6 py-3 text-sm font-bold text-white hover:brightness-110"
               >
-                Buy on Amazon
+                Buy now
               </a>
             )}
             {product.ebay_item_id && (
               <a
-                href={`https://www.ebay.${cc.code === "uk" ? "co.uk" : cc.code}/itm/${product.ebay_item_id}`}
+                href={ebayItemUrl(cc, product.ebay_item_id)}
                 target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-none bg-[#E53238] px-6 py-3 text-sm font-bold text-white hover:brightness-110"
+                rel="noopener sponsored nofollow"
+                className="rounded-none border border-foreground px-6 py-3 text-sm font-bold hover:border-brand hover:text-brand"
               >
-                Buy on eBay
+                Buy on marketplace
               </a>
             )}
           </div>
