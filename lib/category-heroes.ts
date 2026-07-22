@@ -26,13 +26,13 @@ const HERO_PNG_SLUGS = new Set<string>([
   "towel-radiators",
 ]);
 
-/** Studio hero art for category browse + showroom fallbacks. Prefer PNG when present. */
+/** Studio hero art for category browse + showroom fallbacks. Prefer WebP when present. */
 export function categoryHeroPath(slug: string): string {
-  if (HERO_PNG_SLUGS.has(slug)) return `/img/categories/heroes/${slug}.png`;
+  if (HERO_PNG_SLUGS.has(slug)) return `/img/categories/heroes/${slug}.webp`;
   if ((CATEGORY_SLUGS as string[]).includes(slug)) {
     return `/img/categories/heroes/${slug}.svg`;
   }
-  return "/img/categories/heroes/portable-air-conditioners.png";
+  return "/img/categories/heroes/portable-air-conditioners.webp";
 }
 
 /** Default spec chips when a live product has no specs yet. */
