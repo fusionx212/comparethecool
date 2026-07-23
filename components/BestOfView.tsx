@@ -4,6 +4,7 @@ import { getProducts } from "@/lib/catalog/products";
 import { slugLabel } from "@/lib/catalog/contract";
 import { getReviewContent } from "@/lib/reviews";
 import { BestOfClient } from "@/components/BestOfClient";
+import { BudgetStrip } from "@/components/BudgetStrip";
 import { toBestOfDTO } from "@/lib/best-of-dto";
 import { categoryPhoto } from "@/lib/product-image";
 
@@ -46,6 +47,12 @@ export async function BestOfView({
 
       <div className="mt-6 flex flex-wrap gap-3">
         <a
+          href="#budget-picks"
+          className="bg-[var(--instock)] px-5 py-3 text-sm font-bold text-white hover:brightness-110"
+        >
+          💷 Budget picks
+        </a>
+        <a
           href="#top-picks"
           className="bg-brand px-5 py-3 text-sm font-bold text-white hover:brightness-110"
         >
@@ -57,6 +64,10 @@ export async function BestOfView({
         >
           Full comparison
         </a>
+      </div>
+
+      <div id="budget-picks" className="mt-10">
+        <BudgetStrip products={dtos} code={code} currencySymbol={cc.currencySymbol} />
       </div>
 
       <BestOfClient

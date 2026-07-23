@@ -55,7 +55,7 @@ export function BestOfClient({
   marketplaceHint: string;
   products: BestOfProductDTO[];
 }) {
-  const [sort, setSort] = useState<SortKey>("recommended");
+  const [sort, setSort] = useState<SortKey>("price-asc");
   const [brand, setBrand] = useState("all");
   const [maxPrice, setMaxPrice] = useState<number | "all">("all");
   const [query, setQuery] = useState("");
